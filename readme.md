@@ -6,7 +6,8 @@ It was one of my first C64-programs after a very long time after my childhood. T
 
 I used the C64 tool SID-Wizard to create the tune (https://csdb.dk/release/?id=165302).  
 
-The tune was then exported into the ".sid" format, and is sourced from the main assembly code. Animations are synced to the beat.  
+The tune was then exported into the ".sid" format, and is sourced from the main assembly code. Animations are synced to the beat: scrolltext speed, character and sprite animations, as well as the logo/sprite scrolling on top.
+
 
 You can see a video of the running program here:
 
