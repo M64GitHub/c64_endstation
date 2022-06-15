@@ -5,7 +5,7 @@ We ranked 4th place, and got a lot of praise, especially for the music :) (see h
 
 It was one of my first C64-programs after a very long time after my childhood. This time (2015) I used "CBM PRG Studio" a unique all in one C64 assembler, charset-, sprite-editor and there is much more to it: https://www.ajordison.co.uk/ .  
 
-I used the C64 tool SID-Wizard to create the tune (https://csdb.dk/release/?id=165302).  
+To create the tune, I used the C64 tool SID-Wizard: https://csdb.dk/release/?id=165302.  
 
 The tune was then exported into the ".sid" format, and is sourced from the main assembly code. Animations are synced to the beat: scrolltext speed, character and sprite animations, as well as the m64- and A4- charset logo and sprite scrolling on top.
 
