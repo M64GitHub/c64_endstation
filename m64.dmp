@@ -1,0 +1,3488 @@
+00001  0000             ; 10 SYS (4096):REM A4 M64 ENDSTATION
+00002  0001             
+00003  0001             *=$801
+00004  0801             
+00005  0801  22 08 0A              BYTE    $22, $08, $0A, $00, $9E, $20, $28,  $34, $30, $39, $36, $29, $3A, $8F, $20, $41, $34, $20, $4D, $36, $34, $20, $45, $4E, $44, $53, $54, $41, $54, $49, $4F, $4E, $00, $00, $00
+00006  0824             
+00007  0824             ;===============================================================================
+00008  0824             ;
+00009  0824             ; M64 - MARIO64 SID-WIZARD SOUND PLAYER V.00.01
+00010  0824             ;
+00011  0824             ;===============================================================================
+00012  0824             
+00013  0824             ; ------------------------------------------------------------------------------
+00014  0824             ; 10 SYS (4096)
+00015  0824             
+00016  0824             ;*=$801
+00017  0824             ;        BYTE    $0E, $08, $0A, $00, $9E, $20, $28,  $34
+00018  0824             ;        BYTE    $30, $39, $36, $29, $00, $00, $00
+00019  0824             
+00020  0824             
+00021  0824             
+00022  0824             INIT_SOUND = $4000
+00023  0824             PLAY_SOUND = $4003
+00024  0824             
+00025  0824             
+00026  0824             RASTERBAR_POS = $12
+00027  0824             SPRY       = 170
+00028  0824             
+00029  0824             TITLEPOS   = $0400+410
+00030  0824             
+00031  0824             CHAN1POS   = $0400+538;498
+00032  0824             CHAN2POS   = $0400+540;+500
+00033  0824             CHAN3POS   = $0400+542;+502
+00034  0824             
+00035  0824             CHAN1COL   = $D800+538;+498
+00036  0824             CHAN2COL   = $D800+540;+500
+00037  0824             CHAN3COL   = $D800+542;+502
+00038  0824             
+00039  0824             CHANCOLON  = 1
+00040  0824             CHANCOLOFF = 14
+00041  0824             
+00042  0824             MINUS      = 94
+00043  0824             PLUS       =24
+00044  0824             
+00045  0824             SWVARS     = INIT_SOUND+$21
+00046  0824             
+00047  0824             
+00048  0824             ;-------------------------------------------------------------------------------
+00049  0824             
+00050  0824             
+00051  0824             ; --- MAIN ---
+00052  0824             
+00053  0824             *          = $1000
+00054  1000             
+00055  1000             INIT       
+00056  1000                        
+00057  1000             
+00058  1000                        ; CLR SCREEN DATA
+00059  1000             @LOOP1     
+00060  1000             
+00061  1000  A0 FF                 LDY #255
+00062  1002  88                    DEY
+00063  1003  D0 FD                 BNE *-1
+00064  1005             
+00065  1005  A9 20                 LDA #$20
+00066  1007             
+00067  1007  9D 00 04              STA $0400,X
+00068  100A  9D 00 05              STA $0500,X
+00069  100D  9D 00 06              STA $0600,X
+00070  1010  9D 00 07              STA $0700,X
+00071  1013             
+00072  1013  A9 01                 LDA #$1         ; CLR SCREEN COLOR
+00073  1015  9D 00 D8              STA $D800,X
+00074  1018  9D 00 D9              STA $D900,X
+00075  101B  9D 00 DA              STA $DA00,X
+00076  101E  9D 00 DB              STA $DB00,X
+00077  1021  CA                    DEX
+00078  1022  D0 DC                 BNE @LOOP1
+00079  1024             
+00080  1024                        ;;__
+00081  1024                        
+00082  1024                        
+00083  1024  20 69 10              JSR RLOOP
+00084  1027  A9 0E                 LDA #14
+00085  1029  8D 20 D0              STA $D020
+00086  102C  8D 21 D0              STA $D021
+00087  102F                        
+00088  102F  20 69 10              JSR RLOOP
+00089  1032  A9 03                 LDA #3
+00090  1034  8D 20 D0              STA $D020
+00091  1037  8D 21 D0              STA $D021
+00092  103A             
+00093  103A  20 69 10              JSR RLOOP
+00094  103D  A9 0E                 LDA #14
+00095  103F  8D 20 D0              STA $D020
+00096  1042  8D 21 D0              STA $D021
+00097  1045             
+00098  1045  20 69 10              JSR RLOOP
+00099  1048  A9 06                 LDA #6
+00100  104A  8D 20 D0              STA $D020
+00101  104D  8D 21 D0              STA $D021
+00102  1050             
+00103  1050  20 69 10              JSR RLOOP
+00104  1053  A9 0B                 LDA #11
+00105  1055  8D 20 D0              STA $D020
+00106  1058  8D 21 D0              STA $D021
+00107  105B             
+00108  105B  20 69 10              JSR RLOOP
+00109  105E  A9 00                 LDA #0
+00110  1060  8D 20 D0              STA $D020
+00111  1063  8D 21 D0              STA $D021
+00112  1066             
+00113  1066  4C 80 10              JMP SCRN_IS_BLACK
+00114  1069                        ;;--
+00115  1069             
+00116  1069             RLOOP      
+00117  1069  A0 05                 LDY #5
+00118  106B             @LL1
+00119  106B  A2 FF                 LDX #$FF
+00120  106D  CA                    DEX
+00121  106E  D0 FD                 BNE *-1
+00122  1070             
+00123  1070  A9 00                 LDA #0
+00124  1072  CD 12 D0              CMP $D012
+00125  1075  D0 FB                 BNE *-3
+00126  1077             
+00127  1077  A2 FF                 LDX #$FF
+00128  1079  CA                    DEX
+00129  107A  D0 FD                 BNE *-1
+00130  107C             
+00131  107C  88                    DEY
+00132  107D  D0 EC                 BNE @LL1
+00133  107F  60                    RTS
+00134  1080             
+00135  1080             
+00136  1080             SCRN_IS_BLACK 
+00137  1080             
+00138  1080             
+00139  1080             
+00140  1080             
+00141  1080  A9 00                 LDA #$00        ; SCREEN BLACK
+00142  1082                        ;STA $D020
+00143  1082                        ;STA $D021
+00144  1082  AA                    TAX
+00145  1083                        
+00146  1083                        ; SETUP CHARSET
+00147  1083  AD 18 D0              LDA $D018       ; BITS 1..3 * $400 = ADDR
+00148  1086  29 F0                 AND #%11110000
+00149  1088  09 08                 ORA #%00001000
+00150  108A  8D 18 D0              STA $D018
+00151  108D  AD 16 D0              LDA $D016       ; TURN OFF MULTICOLOR FOR CHARACTERS
+00152  1090  29 EF                 AND #$EF        ; BY CLEAING BIT#4 OF $D016
+00153  1092  8D 16 D0              STA $D016
+00154  1095             
+00155  1095             
+00156  1095  4C 4F 65              JMP     DO_FADEIN
+00157  1098             
+00158  1098             CONTINUE
+00159  1098             
+00160  1098             
+00161  1098             
+00162  1098             
+00163  1098             
+00164  1098                        ; SPEEDUP DRAWLOGO
+00165  1098  A9 04                 LDA #$04
+00166  109A  8D 38 1A              STA DRL_STA_0400+2
+00167  109D  AD 73 5F              LDA LOGO_X
+00168  10A0  8D 37 1A              STA DRL_STA_0400+1
+00169  10A3             
+00170  10A3  A9 D8                 LDA #$D8
+00171  10A5  8D 3E 1A              STA DRL_STA_D800+2
+00172  10A8  AD 73 5F              LDA LOGO_X
+00173  10AB  8D 3D 1A              STA DRL_STA_D800+1
+00174  10AE             
+00175  10AE             
+00176  10AE  20 2F 1A              JSR DRAW_LOGO
+00177  10B1             
+00178  10B1                        ; SPEEDUP DRAWLOGO
+00179  10B1  A9 04                 LDA #$04
+00180  10B3  8D 38 1A              STA DRL_STA_0400+2
+00181  10B6  AD 73 5F              LDA LOGO_X
+00182  10B9  8D 37 1A              STA DRL_STA_0400+1
+00183  10BC             
+00184  10BC  A9 D8                 LDA #$D8
+00185  10BE  8D 3E 1A              STA DRL_STA_D800+2
+00186  10C1  AD 73 5F              LDA LOGO_X
+00187  10C4  8D 3D 1A              STA DRL_STA_D800+1
+00188  10C7                        
+00189  10C7  20 65 1A              JSR WAITKEY
+00190  10CA             
+00191  10CA             
+00192  10CA             ;@XXX1
+00193  10CA             ;        LDX FI_SPR_CTR
+00194  10CA             ;        LDA FADE_IN_COLORS_SPRITE,X
+00195  10CA             ;        STA $D027
+00196  10CA             
+00197  10CA             ;        JSR RLOOP2
+00198  10CA             
+00199  10CA             ;        INC FI_SPR_CTR
+00200  10CA             ;        LDA FI_SPR_CTR
+00201  10CA             ;        CMP #13
+00202  10CA             ;        BNE @XXX1
+00203  10CA             
+00204  10CA             
+00205  10CA             
+00206  10CA             
+00207  10CA             
+00208  10CA  A0 01                 LDY #1
+00209  10CC  20 7D 1A              JSR PRINTSTARTMSG
+00210  10CF             
+00211  10CF             
+00212  10CF  A9 00                 LDA #0
+00213  10D1  CD 12 D0              CMP $D012
+00214  10D4  D0 FB                 BNE *-3
+00215  10D6             
+00216  10D6             
+00217  10D6  A9 FF                 LDA #255
+00218  10D8  CD 12 D0              CMP $D012
+00219  10DB  D0 FB                 BNE *-3
+00220  10DD                        
+00221  10DD             
+00222  10DD  A2 FF                 LDX #$FF
+00223  10DF  CA                    DEX
+00224  10E0  D0 FD                 BNE *-1
+00225  10E2             
+00226  10E2  A9 00                 LDA #0
+00227  10E4  CD 12 D0              CMP $D012
+00228  10E7  D0 FB                 BNE *-3
+00229  10E9             
+00230  10E9  A9 01                 LDA #1
+00231  10EB  8D 20 D0              STA $D020
+00232  10EE  8D 21 D0              STA $D021
+00233  10F1             
+00234  10F1  A9 FF                 LDA #255
+00235  10F3  CD 12 D0              CMP $D012
+00236  10F6  D0 FB                 BNE *-3
+00237  10F8                        
+00238  10F8             
+00239  10F8  A2 FF                 LDX #$FF
+00240  10FA  CA                    DEX
+00241  10FB  D0 FD                 BNE *-1
+00242  10FD             
+00243  10FD  A9 00                 LDA #0
+00244  10FF  CD 12 D0              CMP $D012
+00245  1102  D0 FB                 BNE *-3
+00246  1104             
+00247  1104  A9 00                 LDA #0
+00248  1106  8D 20 D0              STA $D020
+00249  1109  8D 21 D0              STA $D021
+00250  110C             
+00251  110C             
+00252  110C             
+00253  110C             
+00254  110C  A2 0D                 LDX #13
+00255  110E             @LOOP_T
+00256  110E  B9 B9 5D              LDA TITLE_FADE1,Y
+00257  1111  9D 95 D9              STA $D800+405,X
+00258  1114             
+00259  1114  B9 F9 5D              LDA TITLE_FADE2,Y
+00260  1117  9D A0 D9              STA $D800+416,X
+00261  111A                        
+00262  111A  CA                    DEX
+00263  111B  D0 F1                 BNE @LOOP_T
+00264  111D             
+00265  111D  A0 00                 LDY #00         ;
+00266  111F  20 A9 1A              JSR PRINTSONGMSG
+00267  1122             
+00268  1122             
+00269  1122             
+00270  1122                        ; MORE TXT
+00271  1122             
+00272  1122  A9 2F                 LDA #$2F  ; '/'
+00273  1124  8D 0C 06              STA $404+520
+00274  1127  A9 32                 LDA #'2'
+00275  1129  8D 0D 06              STA $405+520
+00276  112C  A9 01                 LDA #'A'
+00277  112E  8D 0E 06              STA $406+520
+00278  1131             
+00279  1131             
+00280  1131  A9 05                 LDA #5
+00281  1133  8D 0A DA              STA $D802+520
+00282  1136  8D 0B DA              STA $D803+520
+00283  1139  8D 0D DA              STA $D805+520
+00284  113C  8D 0E DA              STA $D806+520
+00285  113F  A9 0D                 LDA #13
+00286  1141  8D 0C DA              STA $D804+520
+00287  1144             
+00288  1144                        ;
+00289  1144             
+00290  1144  A9 02                 LDA #2
+00291  1146  8D 26 DA              STA $D81E+520
+00292  1149  8D 27 DA              STA $D81F+520
+00293  114C             
+00294  114C  8D 29 DA              STA $D821+520
+00295  114F  8D 2A DA              STA $D822+520
+00296  1152             
+00297  1152  8D 2C DA              STA $D824+520
+00298  1155  8D 2D DA              STA $D825+520
+00299  1158             
+00300  1158  A9 0A                 LDA #10
+00301  115A  8D 28 DA              STA $D820+520
+00302  115D  8D 2B DA              STA $D823+520
+00303  1160  A9 2F                 LDA #$2F  ; '/'
+00304  1162  8D 28 06              STA $420+520
+00305  1165  8D 2B 06              STA $423+520
+00306  1168             
+00307  1168                        
+00308  1168             
+00309  1168             
+00310  1168  A9 00                 LDA #0          ; TUNE #0
+00311  116A  20 00 40              JSR INIT_SOUND
+00312  116D             
+00313  116D                        ; SETUP SPRITES @2400
+00314  116D  A2 90                 LDX #$90
+00315  116F  8E F8 07              STX $07F8
+00316  1172  E8                    INX
+00317  1173  8E F9 07              STX $07F9
+00318  1176  E8                    INX
+00319  1177  8E FA 07              STX $07FA
+00320  117A  E8                    INX
+00321  117B  8E FB 07              STX $07FB
+00322  117E  E8                    INX
+00323  117F  8E FC 07              STX $07FC
+00324  1182  E8                    INX
+00325  1183  8E FD 07              STX $07FD
+00326  1186  E8                    INX
+00327  1187  8E FE 07              STX $07FE
+00328  118A  E8                    INX
+00329  118B  8E FF 07              STX $07FF
+00330  118E             
+00331  118E             
+00332  118E  A9 00                 LDA #%00000000
+00333  1190  8D 15 D0              STA $D015 ; 1-8 SPRITES ON
+00334  1193  A9 FF                 LDA #$FF
+00335  1195  8D 1C D0              STA $D01C ; 1-8 SPRITES MULTICOLOR OFF
+00336  1198                        
+00337  1198  A9 06                 LDA #6    ; 14LBLU, 4 LILA
+00338  119A  8D 27 D0              STA $D027 ; SPRCOLOR SPR #0
+00339  119D  8D 28 D0              STA $D028 ; SPRCOLOR SPR #1
+00340  11A0  8D 29 D0              STA $D029 ; SPRCOLOR SPR #2
+00341  11A3  8D 2A D0              STA $D02A ; SPRCOLOR SPR #3
+00342  11A6  8D 2B D0              STA $D02B ; SPRCOLOR SPR #4
+00343  11A9  8D 2C D0              STA $D02C ; SPRCOLOR SPR #5
+00344  11AC  8D 2D D0              STA $D02D ; SPRCOLOR SPR #6
+00345  11AF  8D 2E D0              STA $D02E ; SPRCOLOR SPR #7
+00346  11B2             
+00347  11B2                        
+00348  11B2                        ; X-COORDS
+00349  11B2  A9 00                 LDA #0
+00350  11B4  8D 10 D0              STA $D010 ; HI BIT X FOR ALL = 0
+00351  11B7             
+00352  11B7                        ; X
+00353  11B7  A9 00                 LDA #0
+00354  11B9  8D 00 D0              STA $D000
+00355  11BC  8D 02 D0              STA $D002
+00356  11BF  8D 04 D0              STA $D004
+00357  11C2  8D 06 D0              STA $D006
+00358  11C5  8D 08 D0              STA $D008
+00359  11C8  8D 0A D0              STA $D00A
+00360  11CB  8D 0C D0              STA $D00C
+00361  11CE  8D 0E D0              STA $D00E
+00362  11D1             
+00363  11D1             
+00364  11D1                        
+00365  11D1                        ; Y
+00366  11D1  A9 AA                 LDA #SPRY
+00367  11D3  8D 01 D0              STA $D001
+00368  11D6  8D 03 D0              STA $D003
+00369  11D9  8D 05 D0              STA $D005
+00370  11DC  8D 07 D0              STA $D007
+00371  11DF  8D 09 D0              STA $D009
+00372  11E2  8D 0B D0              STA $D00B
+00373  11E5  8D 0D D0              STA $D00D
+00374  11E8  8D 0F D0              STA $D00F
+00375  11EB             
+00376  11EB             
+00377  11EB                        ; ----
+00378  11EB             
+00379  11EB             ; FILL DOTS
+00380  11EB  A9 00                 LDA #00
+00381  11ED             
+00382  11ED  A2 50                 LDX #80
+00383  11EF             
+00384  11EF             @DL1
+00385  11EF                        
+00386  11EF  9D 57 06              STA $0400+599,X
+00387  11F2  9D 7F 06              STA $0400+639,X
+00388  11F5  9D CF 06              STA $0400+719,X
+00389  11F8  9D 1F 07              STA $0400+799,X
+00390  11FB                        
+00391  11FB  CA                    DEX
+00392  11FC  D0 F1                 BNE @DL1
+00393  11FE             
+00394  11FE             
+00395  11FE                        ; CHAR ANI
+00396  11FE  A9 4B                 LDA #$4B
+00397  1200  8D 18 06              STA CHAN1POS-2
+00398  1203  A9 0B                 LDA #11
+00399  1205  8D 18 DA              STA CHAN1COL-2
+00400  1208             
+00401  1208                        
+00402  1208             
+00403  1208  AD 6B 17              LDA AC_1
+00404  120B  8D 19 06              STA CHAN1POS-1
+00405  120E  8D 1B 06              STA CHAN1POS+1
+00406  1211             
+00407  1211  AD 6C 17              LDA AC_2
+00408  1214  8D 1D 06              STA CHAN3POS-1
+00409  1217  8D 1F 06              STA CHAN3POS+1
+00410  121A             
+00411  121A  A9 04                 LDA #4
+00412  121C  8D 19 DA              STA CHAN1COL-1
+00413  121F  8D 1B DA              STA CHAN1COL+1
+00414  1222  8D 1D DA              STA CHAN3COL-1
+00415  1225  8D 1F DA              STA CHAN3COL+1
+00416  1228                        
+00417  1228  A9 4C                 LDA #$4C
+00418  122A  8D 20 06              STA CHAN3POS+2
+00419  122D  A9 0B                 LDA #11
+00420  122F  8D 20 DA              STA CHAN3COL+2
+00421  1232             
+00422  1232                        
+00423  1232             
+00424  1232  A2 F0                 LDX #240
+00425  1234             
+00426  1234  BD 88 28   @DOTLOOP   LDA DOTCOLORS,X
+00427  1237  9D 57 DA              STA $DA57,X
+00428  123A  CA                    DEX
+00429  123B  D0 F7                 BNE @DOTLOOP
+00430  123D             
+00431  123D                        
+00432  123D                        ; DEC @SCROLLCOL_CNT
+00433  123D                        ; BEQ @DO_SCROLLCOLMOVE
+00434  123D                        ; RTS
+00435  123D             
+00436  123D             ;@DO_SCROLLCOLMOVE
+00437  123D                        ;               LDA #1
+00438  123D                        ;              STA @SCROLLCOL_CNT
+00439  123D             
+00440  123D             
+00441  123D             
+00442  123D                        ;       JMP IRQINIT
+00443  123D             
+00444  123D             ;@SCROLLCOL_CNT BYTE 4
+00445  123D                        
+00446  123D             
+00447  123D  A9 00                 LDA #0
+00448  123F  8D 1B D0              STA $D01B
+00449  1242                        
+00450  1242             
+00451  1242             
+00452  1242             IRQINIT
+00453  1242  78                    SEI
+00454  1243             
+00455  1243  A0 7F                 LDY #$7F  ; $7F = %01111111
+00456  1245  8C 0D DC              STY $DC0D ; TURN OFF CIAS TIMER INTERRUPTS
+00457  1248  8C 0D DD              STY $DD0D ; TURN OFF CIAS TIMER INTERRUPTS
+00458  124B  AD 0D DC              LDA $DC0D ; CANCEL ALL CIA-IRQS IN QUEUE/UNPROCESSED
+00459  124E  AD 0D DD              LDA $DD0D ; CANCEL ALL CIA-IRQS IN QUEUE/UNPROCESSED
+00460  1251  A9 01                 LDA #$01  ; SET INTERRUPT REQUEST MASK...
+00461  1253  8D 1A D0              STA $D01A ; ...WE WANT IRQ BY RASTERBEAM
+00462  1256                        
+00463  1256  A9 00                 LDA #0  ; INTERRUPT AT LINE 0
+00464  1258  8D 12 D0              STA $D012
+00465  125B                        
+00466  125B  AD 11 D0              LDA $D011 ; BIT#0 OF $D011 IS BASICALLY...
+00467  125E  29 7F                 AND #$7F ; ...THE 9TH BIT FOR $D012
+00468  1260             
+00469  1260  8D 11 D0              STA $D011 ; WE NEED TO MAKE SURE IT IS SET TO ZERO
+00470  1263             
+00471  1263  A9 01                 LDA #1
+00472  1265  8D 19 D0              STA $D019 ; RASTER COMPARE IQ FLAG = 1
+00473  1268                        
+00474  1268             
+00475  1268  A5 01                 LDA $01                           ;INHALT VON $01 IN DEN AKKU
+00476  126A  29 FD                 AND #%11111101                    ;KERNAL- & BASIC-ROM
+00477  126C  85 01                 STA $01                           ;AUSBLENDEN
+00478  126E  A9 00                 LDA #<IRQ ; POINT IRQ VECTOR TO OUR CUSTOM IRQ ROUTINE
+00479  1270  A2 13                 LDX #>IRQ
+00480  1272  8D FE FF              STA $FFFE
+00481  1275  8E FF FF              STX $FFFF
+00482  1278                        
+00483  1278                        ;JSR IRQ0_INIT
+00484  1278             
+00485  1278  58                    CLI ; CLEAR INTERRUPT DISABLE FLAG
+00486  1279             
+00487  1279                        ;LDA $D011
+00488  1279                        ;AND #%11101111
+00489  1279                        ;STA $D011
+00490  1279             
+00491  1279  4C 79 12              JMP * ; INFINITE LOOP
+00492  127C             
+00493  127C  60                    RTS
+00494  127D             
+00495  127D             
+00496  127D  FF         FRAMECTR   BYTE $FF
+00497  127E             
+00498  127E             ALIGN      256
+00499  1300             ; -----------------
+00500  1300             ; * IRQ / MAIN LOOP
+00501  1300  CE 19 D0   IRQ        DEC $D019 ; ACKNOWLEDGE IRQ
+00502  1303             
+00503  1303  EE 7D 12              INC FRAMECTR
+00504  1306             
+00505  1306  6E 03 20              ROR $2003
+00506  1309  90 05                 BCC @LALA
+00507  130B  A9 80                 LDA #%10000000
+00508  130D  8D 03 20              STA $2003
+00509  1310             @LALA
+00510  1310             
+00511  1310                        
+00512  1310             
+00513  1310  20 6F 17              JSR CHAR_ANI
+00514  1313             
+00515  1313  20 51 19              JSR LOGO_SCROLL_LR
+00516  1316                        
+00517  1316             ;        LDA #117;#137
+00518  1316             ;        CLC
+00519  1316             ;        SBC $D016
+00520  1316             ;
+00521  1316             ;        STA $D000
+00522  1316             ;        LDA #97
+00523  1316             ;        STA $D001
+00524  1316  A9 FE                 LDA #%11111110
+00525  1318  8D 1C D0              STA $D01C
+00526  131B                        ;;;LDA #13
+00527  131B             
+00528  131B  AD 43 40              LDA SWVARS+34
+00529  131E  C9 0A                 CMP #$A
+00530  1320  B0 05                 BCS @DODO
+00531  1322             
+00532  1322  A9 0D                 LDA #13   ; FAARBE
+00533  1324  4C 3D 13              JMP @SK2
+00534  1327             
+00535  1327             @DODO
+00536  1327                        
+00537  1327  EE F9 13              INC A4_COLOR_CTR
+00538  132A  AD F9 13              LDA A4_COLOR_CTR
+00539  132D                        ;CMP #128
+00540  132D  D0 05                 BNE @SK
+00541  132F  A9 00                 LDA #0
+00542  1331  8D F9 13              STA A4_COLOR_CTR
+00543  1334                        
+00544  1334             @SK
+00545  1334  18                    CLC
+00546  1335  29 FC                 AND #%11111100
+00547  1337  6A                    ROR
+00548  1338  6A                    ROR
+00549  1339  AA                    TAX
+00550  133A             
+00551  133A  BD 0A 65              LDA A4_COLORS,X
+00552  133D             @SK2       
+00553  133D  8D 27 D0              STA $D027
+00554  1340             
+00555  1340             @SKK
+00556  1340  A9 98                 LDA #$98
+00557  1342  8D F8 07              STA $07F8
+00558  1345  A9 76                 LDA #118 ;#117;#11;#81
+00559  1347  18                    CLC
+00560  1348  ED 16 D0              SBC $D016
+00561  134B                        
+00562  134B  8D 00 D0              STA $D000
+00563  134E  A9 61                 LDA #97;#81
+00564  1350  8D 01 D0              STA $D001
+00565  1353             
+00566  1353  20 EB 16              JSR RASTA1
+00567  1356             
+00568  1356  20 2F 1A              JSR DRAW_LOGO
+00569  1359                        ;INC $D021
+00570  1359                        
+00571  1359  A9 00                 LDA #0
+00572  135B  8D 16 D0              STA $D016
+00573  135E                        
+00574  135E  20 6C 14              JSR SOUND_VIS
+00575  1361             
+00576  1361  20 40 15              JSR MOVE_SPRITES
+00577  1364                        
+00578  1364             
+00579  1364  20 03 40              JSR PLAY_SOUND
+00580  1367             
+00581  1367  20 73 19              JSR LOGO_COLOR_ANI
+00582  136A                        
+00583  136A             
+00584  136A             
+00585  136A             
+00586  136A             
+00587  136A             
+00588  136A  A9 E2                 LDA #226
+00589  136C  CD 12 D0              CMP $D012
+00590  136F  D0 FB                 BNE *-3
+00591  1371             
+00592  1371             ;--
+00593  1371  AD 43 40              LDA SWVARS+34
+00594  1374  C9 04                 CMP #4
+00595  1376  90 13                 BCC @SKIP1
+00596  1378             ;-
+00597  1378  20 B3 17              JSR SCROLLER
+00598  137B  20 2B 17              JSR RASTA2
+00599  137E             
+00600  137E  A9 00                 LDA #0
+00601  1380  CD 98 5F              CMP DO1
+00602  1383  F0 03                 BEQ @NOSPEEDSCROLL
+00603  1385                        
+00604  1385  20 B3 17              JSR SCROLLER
+00605  1388                        
+00606  1388             @NOSPEEDSCROLL 
+00607  1388  4C 8E 13              JMP @SKIP2
+00608  138B             
+00609  138B             
+00610  138B             @SKIP1     
+00611  138B  20 2B 17              JSR RASTA2
+00612  138E             
+00613  138E             @SKIP2     
+00614  138E                        
+00615  138E  AD D3 5E              LDA LSRL_BUF
+00616  1391  8D 16 D0              STA $D016
+00617  1394             
+00618  1394  AD 43 40              LDA SWVARS+34
+00619  1397  C9 08                 CMP #$8 ; 8!!!!!!!!!!!!!!1
+00620  1399  90 03                 BCC @SKIP3
+00621  139B  20 F9 15              JSR MOVE_SPRITES2
+00622  139E             
+00623  139E             
+00624  139E             @SKIP3
+00625  139E             
+00626  139E  A9 00                 LDA #0
+00627  13A0  CD F7 13              CMP @STUFFFLAG
+00628  13A3  F0 30                 BEQ @DOSC
+00629  13A5                        
+00630  13A5  8D F7 13              STA @STUFFFLAG
+00631  13A8                        
+00632  13A8  20 A9 19              JSR FADE_MSGS
+00633  13AB             
+00634  13AB             
+00635  13AB             ;--
+00636  13AB             
+00637  13AB  AD 43 40              LDA SWVARS+34
+00638  13AE  C9 06                 CMP #$6
+00639  13B0  90 20                 BCC @SKIP4
+00640  13B2  EE D2 5E              INC FADE_CTR_T
+00641  13B5  AC D2 5E              LDY FADE_CTR_T
+00642  13B8  C0 40                 CPY #64
+00643  13BA             
+00644  13BA  D0 05                 BNE @GOON_T
+00645  13BC  A0 00                 LDY #0
+00646  13BE  8C D2 5E              STY FADE_CTR_T
+00647  13C1             
+00648  13C1             @GOON_T
+00649  13C1             
+00650  13C1  A2 0D                 LDX #13
+00651  13C3             @LOOP_T
+00652  13C3  B9 B9 5D              LDA TITLE_FADE1,Y
+00653  13C6  9D 95 D9              STA $D800+405,X
+00654  13C9                        
+00655  13C9             
+00656  13C9  B9 F9 5D              LDA TITLE_FADE2,Y
+00657  13CC  9D A0 D9              STA $D800+416,X
+00658  13CF                        
+00659  13CF  CA                    DEX
+00660  13D0  D0 F1                 BNE @LOOP_T
+00661  13D2             ; --
+00662  13D2             @SKIP4
+00663  13D2                        
+00664  13D2             
+00665  13D2  4C E0 13              JMP @CONT01
+00666  13D5             
+00667  13D5             @DOSC      
+00668  13D5  20 32 19              JSR MOVE_SCROLLCOLORS
+00669  13D8  20 FA 13              JSR DO_VIS
+00670  13DB             
+00671  13DB  A9 01                 LDA #1
+00672  13DD  8D F7 13              STA @STUFFFLAG
+00673  13E0             
+00674  13E0             @CONT01    
+00675  13E0                        
+00676  13E0                        ; SPEEDUP DRAWLOGO
+00677  13E0  A9 04                 LDA #$04
+00678  13E2  8D 38 1A              STA DRL_STA_0400+2
+00679  13E5  AD 73 5F              LDA LOGO_X
+00680  13E8  8D 37 1A              STA DRL_STA_0400+1
+00681  13EB             
+00682  13EB  A9 D8                 LDA #$D8
+00683  13ED  8D 3E 1A              STA DRL_STA_D800+2
+00684  13F0  AD 73 5F              LDA LOGO_X
+00685  13F3  8D 3D 1A              STA DRL_STA_D800+1
+00686  13F6                        
+00687  13F6  40                    RTI
+00688  13F7             
+00689  13F7  00         @STUFFFLAG BYTE 0
+00690  13F8             
+00691  13F8  0D         A4_COLOR   BYTE 13
+00692  13F9  00         A4_COLOR_CTR BYTE 0
+00693  13FA             
+00694  13FA             
+00695  13FA             DO_VIS
+00696  13FA             
+00697  13FA                        ; 43 = INST NR = CURINST
+00698  13FA                        
+00699  13FA                        
+00700  13FA             ; 34 = CURR SEQ POS
+00701  13FA             
+00702  13FA  AD 43 40              LDA SWVARS+34
+00703  13FD  29 F0                 AND #%11110000
+00704  13FF  18                    CLC
+00705  1400  6A                    ROR
+00706  1401  6A                    ROR
+00707  1402  6A                    ROR
+00708  1403  6A                    ROR
+00709  1404  AA                    TAX
+00710  1405  BD 85 5F              LDA BIN2HEXTBL,X
+00711  1408  8D 0A 06              STA $402+520
+00712  140B  AD 43 40              LDA SWVARS+34
+00713  140E  29 0F                 AND #%00001111
+00714  1410  AA                    TAX
+00715  1411  BD 85 5F              LDA BIN2HEXTBL,X
+00716  1414  8D 0B 06              STA $403+520
+00717  1417                        
+00718  1417             
+00719  1417             ;        LDA SWVARS+41
+00720  1417             ;        AND #%11110000
+00721  1417             ;        ROR
+00722  1417             ;        ROR
+00723  1417             ;        ROR
+00724  1417             ;        ROR
+00725  1417             ;        TAX
+00726  1417             ;        LDA BIN2HEXTBL,X
+00727  1417             ;        STA $402+720
+00728  1417             ;        LDA SWVARS+41
+00729  1417             ;        AND #%00001111
+00730  1417             ;        TAX
+00731  1417             ;        LDA BIN2HEXTBL,X
+00732  1417             ;        STA $403+720
+00733  1417             
+00734  1417             
+00735  1417             ;        LDA SWVARS+48
+00736  1417             ;        AND #%11110000
+00737  1417             ;        ROR
+00738  1417             ;        ROR
+00739  1417             ;        ROR
+00740  1417             ;        ROR
+00741  1417             ;        TAX
+00742  1417             ;        LDA BIN2HEXTBL,X
+00743  1417             ;        STA $402+800
+00744  1417             ;        LDA SWVARS+48
+00745  1417             ;        AND #%00001111
+00746  1417             ;        TAX
+00747  1417             ;        LDA BIN2HEXTBL,X
+00748  1417             ;        STA $403+800
+00749  1417             
+00750  1417             
+00751  1417             
+00752  1417             
+00753  1417             ; 37 = CURR PATTERN
+00754  1417             
+00755  1417  AD 4C 40              LDA SWVARS+43
+00756  141A  29 F0                 AND #%11110000
+00757  141C  6A                    ROR
+00758  141D  6A                    ROR
+00759  141E  6A                    ROR
+00760  141F  6A                    ROR
+00761  1420  AA                    TAX
+00762  1421  BD 85 5F              LDA BIN2HEXTBL,X
+00763  1424  8D 26 06              STA $41E+520
+00764  1427  AD 4C 40              LDA SWVARS+43
+00765  142A  29 0F                 AND #%00001111
+00766  142C  AA                    TAX
+00767  142D  BD 85 5F              LDA BIN2HEXTBL,X
+00768  1430  8D 27 06              STA $41F+520
+00769  1433                        
+00770  1433             
+00771  1433  AD 53 40              LDA SWVARS+50
+00772  1436  29 F0                 AND #%11110000
+00773  1438  6A                    ROR
+00774  1439  6A                    ROR
+00775  143A  6A                    ROR
+00776  143B  6A                    ROR
+00777  143C  AA                    TAX
+00778  143D  BD 85 5F              LDA BIN2HEXTBL,X
+00779  1440  8D 29 06              STA $421+520
+00780  1443  AD 53 40              LDA SWVARS+50
+00781  1446  29 0F                 AND #%00001111
+00782  1448  AA                    TAX
+00783  1449  BD 85 5F              LDA BIN2HEXTBL,X
+00784  144C  8D 2A 06              STA $422+520
+00785  144F             
+00786  144F             
+00787  144F  AD 5A 40              LDA SWVARS+57
+00788  1452  29 F0                 AND #%11110000
+00789  1454  6A                    ROR
+00790  1455  6A                    ROR
+00791  1456  6A                    ROR
+00792  1457  6A                    ROR
+00793  1458  AA                    TAX
+00794  1459  BD 85 5F              LDA BIN2HEXTBL,X
+00795  145C  8D 2C 06              STA $424+520
+00796  145F  AD 5A 40              LDA SWVARS+57
+00797  1462  29 0F                 AND #%00001111
+00798  1464  AA                    TAX
+00799  1465  BD 85 5F              LDA BIN2HEXTBL,X
+00800  1468  8D 2D 06              STA $425+520
+00801  146B             
+00802  146B             
+00803  146B             
+00804  146B  60                    RTS
+00805  146C             
+00806  146C             
+00807  146C             
+00808  146C             
+00809  146C             
+00810  146C                        
+00811  146C             
+00812  146C             ; --- SOUNDVIS ---
+00813  146C             ;VARPOS=PLAYERADDR+$21 ;VARIABLES START HERE - MUST BE FIXED ADDRESS FROM NOW ON...
+00814  146C             ;VARIABLES FOR CHANNEL1, (FOR OTHER CHANNELS 7 / 14 MUST BE ADDED TO THE ADDRESS):
+00815  146C             ;SPDCNT=VARPOS+1*3*7+1 ;SPEED/TEMPO-COUNTER (TO GRAB FINER-GRADE MOMENTS)
+00816  146C             ;SEQPOS=VARPOS+1*3*7+2 ;SEQUENCE-POSITION ON CHANNEL 1 - USEFUL FOR DEMO-TIMING
+00817  146C             ;CURPTN=VARPOS+2*3*7+0 ;CURRENTLY PLAYED PATTERN (FOR DEMO MAYBE)
+00818  146C             ;CURNOT=VARPOS+2*3*7+1 ;CURRENT NOTE
+00819  146C             ;CURIFX=VARPOS+2*3*7+3 ;CURRENT INSTRUMENT/FX COLUMN VALUE
+00820  146C             ;CURINS=VARPOS+2*3*7+4 ;CURRENTLY SELECTED INSTRUMENT, MUST BE CHANGED TEMPORARILY
+00821  146C             ;CURFX2=VARPOS+2*3*7+5 ;SMALL PATTERN-EFFECT CAN BE USED TO CONTROL VOLUME OF SFX
+00822  146C             
+00823  146C             
+00824  146C             
+00825  146C             SOUND_VIS
+00826  146C             
+00827  146C  A9 04                 LDA #4
+00828  146E  8D 19 DA              STA CHAN1COL-1
+00829  1471  8D 1B DA              STA CHAN1COL+1
+00830  1474  8D 1D DA              STA CHAN3COL-1
+00831  1477  8D 1F DA              STA CHAN3COL+1
+00832  147A             
+00833  147A  AD 22 40              LDA SWVARS+1
+00834  147D  CD 95 5F              CMP LAST1
+00835  1480  D0 16                 BNE @GO1
+00836  1482  AD 6D 17              LDA AC_3
+00837  1485  8D 1A 06              STA CHAN1POS
+00838  1488                        ;LDA $D015
+00839  1488                        ;AND #%11110110
+00840  1488                        ;STA $D015
+00841  1488  A9 0E                 LDA #CHANCOLOFF
+00842  148A  8D 1A DA              STA CHAN1COL
+00843  148D  8D 25 D0              STA $D025
+00844  1490                        
+00845  1490  A9 00                 LDA #0
+00846  1492  8D 98 5F              STA DO1
+00847  1495             
+00848  1495  4C E3 14              JMP @GO11
+00849  1498                        
+00850  1498  8D 95 5F   @GO1       STA LAST1
+00851  149B  A9 47                 LDA #$47
+00852  149D  8D 1A 06              STA CHAN1POS
+00853  14A0  A9 01                 LDA #CHANCOLON
+00854  14A2  8D 1A DA              STA CHAN1COL
+00855  14A5  A9 01                 LDA #1
+00856  14A7  8D 98 5F              STA DO1
+00857  14AA             
+00858  14AA             
+00859  14AA  A9 07                 LDA #7
+00860  14AC  8D 19 DA              STA CHAN1COL-1
+00861  14AF  8D 1F DA              STA CHAN3COL+1
+00862  14B2             
+00863  14B2  A9 01                 LDA #1
+00864  14B4  8D 1B DA              STA CHAN1COL+1
+00865  14B7  8D 1D DA              STA CHAN3COL-1
+00866  14BA             
+00867  14BA  8D 25 D0              STA $D025
+00868  14BD             
+00869  14BD             
+00870  14BD                        ;LDA $D015
+00871  14BD                        ;ORA #%00001001
+00872  14BD                        ;STA $D015
+00873  14BD             
+00874  14BD  6E 03 20              ROR $2003
+00875  14C0  90 05                 BCC @LALA
+00876  14C2  A9 80                 LDA #%10000000
+00877  14C4  8D 03 20              STA $2003
+00878  14C7             @LALA
+00879  14C7             
+00880  14C7  AD 43 40              LDA SWVARS+34
+00881  14CA  C9 04                 CMP #4
+00882  14CC  90 15                 BCC @GO11
+00883  14CE             
+00884  14CE  20 51 19              JSR LOGO_SCROLL_LR
+00885  14D1  20 51 19              JSR LOGO_SCROLL_LR
+00886  14D4  20 51 19              JSR LOGO_SCROLL_LR
+00887  14D7  20 51 19              JSR LOGO_SCROLL_LR
+00888  14DA  20 40 15              JSR MOVE_SPRITES
+00889  14DD  20 40 15              JSR MOVE_SPRITES
+00890  14E0  20 40 15              JSR MOVE_SPRITES
+00891  14E3                        
+00892  14E3             
+00893  14E3             
+00894  14E3                        ;JSR SCROLLER
+00895  14E3             
+00896  14E3             @GO11
+00897  14E3             
+00898  14E3  AD 29 40              LDA SWVARS+8
+00899  14E6  CD 96 5F              CMP LAST2
+00900  14E9  D0 13                 BNE @GO2
+00901  14EB  AD 6D 17              LDA AC_3
+00902  14EE  8D 1C 06              STA CHAN2POS
+00903  14F1                        ;LDA $D015
+00904  14F1                        ;AND #%11101101
+00905  14F1                        ;STA $D015
+00906  14F1  A9 0E                 LDA #CHANCOLOFF
+00907  14F3  8D 1C DA              STA CHAN2COL
+00908  14F6  A9 00                 LDA #0
+00909  14F8  8D 99 5F              STA DO2
+00910  14FB             
+00911  14FB  4C 10 15              JMP @GO22
+00912  14FE                        
+00913  14FE  8D 96 5F   @GO2       STA LAST2
+00914  1501  A9 47                 LDA #$47
+00915  1503  8D 1C 06              STA CHAN2POS
+00916  1506                        ;LDA $D015
+00917  1506                        ;ORA #%00010010
+00918  1506                        ;STA $D015
+00919  1506  A9 01                 LDA #CHANCOLON
+00920  1508  8D 1C DA              STA CHAN2COL
+00921  150B  A9 01                 LDA #1
+00922  150D  8D 99 5F              STA DO2
+00923  1510             
+00924  1510             @GO22
+00925  1510             
+00926  1510  AD 30 40              LDA SWVARS+15
+00927  1513  CD 97 5F              CMP LAST3
+00928  1516  D0 13                 BNE @GO3
+00929  1518  AD 6D 17              LDA AC_3
+00930  151B  8D 1E 06              STA CHAN3POS
+00931  151E                        ;LDA $D015
+00932  151E                        ;AND #%11011011
+00933  151E                        ;STA $D015
+00934  151E  A9 0E                 LDA #CHANCOLOFF
+00935  1520  8D 1E DA              STA CHAN3COL
+00936  1523  A9 00                 LDA #0
+00937  1525  8D 9A 5F              STA DO3
+00938  1528             
+00939  1528  4C 3D 15              JMP @GO33
+00940  152B                        
+00941  152B  8D 97 5F   @GO3       STA LAST3
+00942  152E  A9 47                 LDA #$47
+00943  1530  8D 1E 06              STA CHAN3POS
+00944  1533                        ;LDA $D015
+00945  1533                        ;ORA #%00100100
+00946  1533                        ;STA $D015
+00947  1533  A9 01                 LDA #CHANCOLON
+00948  1535  8D 1E DA              STA CHAN3COL
+00949  1538  A9 01                 LDA #1
+00950  153A  8D 9A 5F              STA DO3
+00951  153D             
+00952  153D             @GO33
+00953  153D             
+00954  153D  60                    RTS
+00955  153E             
+00956  153E             
+00957  153E             
+00958  153E             
+00959  153E             ;------------------
+00960  153E             ; * MOVE SPTITES
+00961  153E             
+00962  153E  00         SPRMOV_OFFS BYTE 0
+00963  153F  00         SPRMOV_YOFFS BYTE 0
+00964  1540             
+00965  1540             MOVE_SPRITES 
+00966  1540  A9 FF                 LDA #$FF
+00967  1542  8D 1C D0              STA $D01C
+00968  1545                        ;AND #%00000111
+00969  1545                        
+00970  1545             ; COLORS
+00971  1545                        ;LDA #11    ; DBLU
+00972  1545                        ;STA $D025 ; MULTICOLOR 1
+00973  1545             
+00974  1545  A9 00                 LDA #0
+00975  1547  8D 1B D0              STA $D01B
+00976  154A             
+00977  154A  A9 01                 LDA #1
+00978  154C  8D 26 D0              STA $D026 ; MULTICOLOR 2
+00979  154F                        
+00980  154F  A9 06                 LDA #6    ; 14LBLU, 4 LILA
+00981  1551  8D 27 D0              STA $D027 ; SPRCOLOR SPR #0
+00982  1554  A9 07                 LDA #7
+00983  1556  8D 28 D0              STA $D028 ; SPRCOLOR SPR #1
+00984  1559  A9 08                 LDA #8
+00985  155B  8D 29 D0              STA $D029
+00986  155E             
+00987  155E             ; PTRS
+00988  155E  18                    CLC
+00989  155F  A2 00                 LDX #$0
+00990  1561  A9 90                 LDA #$90
+00991  1563             
+00992  1563             @LOOP2
+00993  1563  9D F8 07              STA $7F8,X
+00994  1566  69 01                 ADC #1
+00995  1568  E8                    INX
+00996  1569  E0 08                 CPX #$8
+00997  156B  D0 F6                 BNE @LOOP2
+00998  156D                        
+00999  156D                        
+01000  156D  A9 D4                 LDA #$D4
+01001  156F  8D 01 D0              STA $D001
+01002  1572             
+01003  1572  A9 CF                 LDA #$CF
+01004  1574  8D 03 D0              STA $D003
+01005  1577                        
+01006  1577  A9 C3                 LDA #$C3
+01007  1579  8D 05 D0              STA $D005
+01008  157C             
+01009  157C                        
+01010  157C  A9 B8                 LDA #$B8
+01011  157E  8D 07 D0              STA $D007
+01012  1581             
+01013  1581  A9 AF                 LDA #$AF
+01014  1583  8D 09 D0              STA $D009
+01015  1586             
+01016  1586  A9 A8                 LDA #$A8
+01017  1588  8D 0B D0              STA $D00B
+01018  158B             
+01019  158B  A9 A4                 LDA #$A4
+01020  158D  8D 0D D0              STA $D00D
+01021  1590             
+01022  1590  A9 A4                 LDA #$A4
+01023  1592  8D 0F D0              STA $D00F
+01024  1595             
+01025  1595             
+01026  1595             
+01027  1595             ; X
+01028  1595                        
+01029  1595  EE 3E 15              INC SPRMOV_OFFS
+01030  1598  AD 3E 15              LDA SPRMOV_OFFS
+01031  159B  C9 55                 CMP #85 ; -----------------------
+01032  159D  D0 05                 BNE @L2
+01033  159F  A9 00                 LDA #0
+01034  15A1  8D 3E 15              STA SPRMOV_OFFS
+01035  15A4             
+01036  15A4             
+01037  15A4                        
+01038  15A4             
+01039  15A4             
+01040  15A4             
+01041  15A4             
+01042  15A4             
+01043  15A4  AA         @L2        TAX
+01044  15A5             
+01045  15A5  BD 00 5B              LDA SIN_X5,X
+01046  15A8  8D 00 D0              STA $D000
+01047  15AB                        
+01048  15AB  8A                    TXA
+01049  15AC  69 08                 ADC #8
+01050  15AE  AA                    TAX
+01051  15AF  BD 00 5B              LDA SIN_X5,X
+01052  15B2  8D 02 D0              STA $D002
+01053  15B5                        
+01054  15B5  8A                    TXA
+01055  15B6  69 08                 ADC #8
+01056  15B8  AA                    TAX
+01057  15B9  BD 00 5B              LDA SIN_X5,X
+01058  15BC  8D 04 D0              STA $D004
+01059  15BF             
+01060  15BF  8A                    TXA
+01061  15C0  69 08                 ADC #8
+01062  15C2  AA                    TAX
+01063  15C3  BD 00 5B              LDA SIN_X5,X
+01064  15C6  8D 06 D0              STA $D006
+01065  15C9             
+01066  15C9  8A                    TXA
+01067  15CA  69 08                 ADC #8
+01068  15CC  AA                    TAX
+01069  15CD  BD 00 5B              LDA SIN_X5,X
+01070  15D0  8D 08 D0              STA $D008
+01071  15D3             
+01072  15D3  8A                    TXA
+01073  15D4  69 08                 ADC #8
+01074  15D6  AA                    TAX
+01075  15D7  BD 00 5B              LDA SIN_X5,X
+01076  15DA  8D 0A D0              STA $D00A
+01077  15DD             
+01078  15DD  8A                    TXA
+01079  15DE  69 08                 ADC #8
+01080  15E0  AA                    TAX
+01081  15E1  BD 00 5B              LDA SIN_X5,X
+01082  15E4  8D 0C D0              STA $D00C
+01083  15E7             
+01084  15E7  8A                    TXA
+01085  15E8  69 08                 ADC #8
+01086  15EA  AA                    TAX
+01087  15EB  BD 00 5B              LDA SIN_X5,X
+01088  15EE  8D 0E D0              STA $D00E
+01089  15F1             
+01090  15F1  A9 FF                 LDA #%11111111
+01091  15F3  8D 15 D0              STA $D015
+01092  15F6                        
+01093  15F6  60                    RTS
+01094  15F7             
+01095  15F7             
+01096  15F7             
+01097  15F7  00         SPRMOV_OFFS2 BYTE 0
+01098  15F8  00         SPRMOV_YOFFS2 BYTE 0
+01099  15F9             
+01100  15F9             MOVE_SPRITES2 
+01101  15F9             ; COLORS
+01102  15F9             
+01103  15F9  A9 FE                 LDA #%11111110
+01104  15FB  8D 1C D0              STA $D01C
+01105  15FE             
+01106  15FE             
+01107  15FE  A9 01                 LDA #1
+01108  1600  8D 27 D0              STA $D027 ; SPRCOLOR SPR #0
+01109  1603             ;
+01110  1603  A9 06                 LDA #6
+01111  1605  8D 28 D0              STA $D028 ; SPRCOLOR SPR #1
+01112  1608  A9 06                 LDA #6
+01113  160A             
+01114  160A  8D 29 D0              STA $D029 ; SPRCOLOR SPR #2
+01115  160D  A9 06                 LDA #$6
+01116  160F  8D 2A D0              STA $D02A ; SPRCOLOR SPR #3
+01117  1612             
+01118  1612             
+01119  1612                        
+01120  1612             
+01121  1612             
+01122  1612             ; PTRS
+01123  1612  18                    CLC
+01124  1613  A2 00                 LDX #$0
+01125  1615  A9 98                 LDA #$98
+01126  1617             
+01127  1617             @LOOP2
+01128  1617  9D F8 07              STA $7F8,X
+01129  161A  69 01                 ADC #1
+01130  161C  E8                    INX
+01131  161D  E0 08                 CPX #$8
+01132  161F  D0 F6                 BNE @LOOP2
+01133  1621             
+01134  1621             
+01135  1621             ; X
+01136  1621  EE F7 15              INC SPRMOV_OFFS2
+01137  1624  AD F7 15              LDA SPRMOV_OFFS2
+01138  1627  C9 64                 CMP #100
+01139  1629  F0 03                 BEQ @TESTPRIORITY
+01140  162B             
+01141  162B             ;                CMP #50
+01142  162B             ;                BEQ @TESTP2
+01143  162B             ;                CMP #99
+01144  162B             ;                BEQ @TESTP2
+01145  162B             
+01146  162B  4C 33 16              JMP @L2
+01147  162E             
+01148  162E             ;@TESTP2
+01149  162E             ;                PHA
+01150  162E             
+01151  162E             ;                LDA #0
+01152  162E             ;                CMP SPRPRIORITY
+01153  162E             ;                BEQ @ITSZERO2
+01154  162E             ;                LDA #$00
+01155  162E             ;                STA SPRPRIORITY
+01156  162E             ;                JMP @TOL22
+01157  162E             
+01158  162E             
+01159  162E             ;@ITSZERO2        LDA #$FF
+01160  162E             ;                STA SPRPRIORITY
+01161  162E             ;                LDA #0
+01162  162E             
+01163  162E             ;
+01164  162E             ;@TOL22          PLA
+01165  162E             ;                JMP @L2
+01166  162E             
+01167  162E             
+01168  162E             
+01169  162E             
+01170  162E             @TESTPRIORITY 
+01171  162E                        
+01172  162E  A9 00                 LDA #0
+01173  1630  8D F7 15              STA SPRMOV_OFFS2
+01174  1633             
+01175  1633             
+01176  1633             ;                LDA #0
+01177  1633             ;                CMP SPRPRIORITY
+01178  1633             ;                BEQ @ITSZERO
+01179  1633             ;                LDA #$00
+01180  1633             ;                STA SPRPRIORITY
+01181  1633             ;                JMP @TOL2
+01182  1633             
+01183  1633             
+01184  1633             ;@ITSZERO        LDA #$FF
+01185  1633             ;                STA SPRPRIORITY
+01186  1633             ;                LDA #0
+01187  1633             
+01188  1633             
+01189  1633             
+01190  1633                        
+01191  1633             @TOL2      
+01192  1633             
+01193  1633             
+01194  1633             @L2        ;TAX
+01195  1633             
+01196  1633                        ;LDA SIN_X2,X
+01197  1633                        ;STA $D000
+01198  1633                        
+01199  1633                        
+01200  1633                        ;TXA
+01201  1633  69 06                 ADC #6
+01202  1635  AA                    TAX
+01203  1636  BD 00 5A              LDA SIN_X2,X
+01204  1639  8D 02 D0              STA $D002
+01205  163C                        
+01206  163C  8A                    TXA
+01207  163D  69 06                 ADC #6
+01208  163F  AA                    TAX
+01209  1640  BD 00 5A              LDA SIN_X2,X
+01210  1643  8D 04 D0              STA $D004
+01211  1646             
+01212  1646  8A                    TXA
+01213  1647  69 06                 ADC #6
+01214  1649  AA                    TAX
+01215  164A  BD 00 5A              LDA SIN_X2,X
+01216  164D  8D 06 D0              STA $D006
+01217  1650             
+01218  1650  8A                    TXA
+01219  1651  69 06                 ADC #6
+01220  1653  AA                    TAX
+01221  1654  BD 00 5A              LDA SIN_X2,X
+01222  1657  8D 08 D0              STA $D008
+01223  165A             
+01224  165A  8A                    TXA
+01225  165B  69 06                 ADC #6
+01226  165D  AA                    TAX
+01227  165E  BD 00 5A              LDA SIN_X2,X
+01228  1661  8D 0A D0              STA $D00A
+01229  1664             
+01230  1664  8A                    TXA
+01231  1665  69 06                 ADC #6
+01232  1667  AA                    TAX
+01233  1668  BD 00 5A              LDA SIN_X2,X
+01234  166B  8D 0C D0              STA $D00C
+01235  166E             
+01236  166E  8A                    TXA
+01237  166F  69 06                 ADC #6
+01238  1671  AA                    TAX
+01239  1672  BD 00 5A              LDA SIN_X2,X
+01240  1675  8D 0E D0              STA $D00E
+01241  1678             
+01242  1678                        ; MOVE Y
+01243  1678                        
+01244  1678  EE F8 15              INC SPRMOV_YOFFS2
+01245  167B  AD F8 15              LDA SPRMOV_YOFFS2
+01246  167E  C9 AA                 CMP #170
+01247  1680  D0 05                 BNE @L3
+01248  1682  A9 00                 LDA #0
+01249  1684  8D F8 15              STA SPRMOV_YOFFS2
+01250  1687                        ;JMP @L3
+01251  1687             
+01252  1687             @CHECK     
+01253  1687             ;                CMP #40
+01254  1687             ;                BEQ @DOITT
+01255  1687             ;                CMP #84
+01256  1687             ;                BEQ @DOITT
+01257  1687             
+01258  1687             ;                JMP @L3
+01259  1687             ;@DOITT
+01260  1687             ;                PHA
+01261  1687             
+01262  1687             ;                LDA #0
+01263  1687             ;                CMP SPRPRIORITY
+01264  1687             ;                BEQ @ITSZERO
+01265  1687             ;                LDA #$00
+01266  1687             ;                STA SPRPRIORITY
+01267  1687             ;                JMP @TOL3
+01268  1687             
+01269  1687             
+01270  1687             ;@ITSZERO        LDA #$FF
+01271  1687             ;                STA SPRPRIORITY
+01272  1687             ;                LDA #0
+01273  1687             
+01274  1687             ;@TOL3           PLA
+01275  1687             
+01276  1687             
+01277  1687             
+01278  1687             
+01279  1687             
+01280  1687  AA         @L3        TAX
+01281  1688             
+01282  1688  BD 00 5B              LDA SIN_X5,X
+01283  168B  8D 01 D0              STA $D001
+01284  168E                        ;STA $D003
+01285  168E                        ;STA $D005
+01286  168E                        ;STA $D007
+01287  168E                        ;STA $D009
+01288  168E             
+01289  168E                        ;RTS
+01290  168E             
+01291  168E             
+01292  168E  8A                    TXA
+01293  168F  69 08                 ADC #8
+01294  1691  AA                    TAX
+01295  1692  BD 00 5B              LDA SIN_X5,X
+01296  1695  18                    CLC
+01297  1696  E9 5E                 SBC #MINUS
+01298  1698  8D 03 D0              STA $D003
+01299  169B                        
+01300  169B  8A                    TXA
+01301  169C  69 04                 ADC #4
+01302  169E  AA                    TAX
+01303  169F  BD 00 5B              LDA SIN_X5,X
+01304  16A2  18                    CLC
+01305  16A3  E9 5E                 SBC #MINUS
+01306  16A5  8D 05 D0              STA $D005
+01307  16A8             
+01308  16A8  8A                    TXA
+01309  16A9  69 04                 ADC #4
+01310  16AB  AA                    TAX
+01311  16AC  BD 00 5B              LDA SIN_X5,X
+01312  16AF  18                    CLC
+01313  16B0  E9 5E                 SBC #MINUS
+01314  16B2  8D 07 D0              STA $D007
+01315  16B5             
+01316  16B5  8A                    TXA
+01317  16B6  69 04                 ADC #4
+01318  16B8  AA                    TAX
+01319  16B9  BD 00 5B              LDA SIN_X5,X
+01320  16BC  18                    CLC
+01321  16BD  E9 5E                 SBC #MINUS
+01322  16BF  8D 09 D0              STA $D009
+01323  16C2             
+01324  16C2  8A                    TXA
+01325  16C3  69 04                 ADC #4
+01326  16C5  AA                    TAX
+01327  16C6  BD 00 5B              LDA SIN_X5,X
+01328  16C9  18                    CLC
+01329  16CA  E9 5E                 SBC #MINUS
+01330  16CC  8D 0B D0              STA $D00B
+01331  16CF             
+01332  16CF  8A                    TXA
+01333  16D0  69 04                 ADC #4
+01334  16D2  AA                    TAX
+01335  16D3  BD 00 5B              LDA SIN_X5,X
+01336  16D6  18                    CLC
+01337  16D7  E9 5E                 SBC #MINUS
+01338  16D9  8D 0D D0              STA $D00D
+01339  16DC             
+01340  16DC  8A                    TXA
+01341  16DD  69 04                 ADC #4
+01342  16DF  AA                    TAX
+01343  16E0  BD 00 5B              LDA SIN_X5,X
+01344  16E3  18                    CLC
+01345  16E4  E9 5E                 SBC #MINUS
+01346  16E6  8D 0F D0              STA $D00F
+01347  16E9             
+01348  16E9  60                    RTS
+01349  16EA             
+01350  16EA             
+01351  16EA  00         SPRPRIORITY BYTE $00
+01352  16EB             
+01353  16EB             
+01354  16EB             ; --- RASTA 1 ---
+01355  16EB             RASTA1     
+01356  16EB  A0 12                 LDY #RASTERBAR_POS
+01357  16ED  A2 00                 LDX #$00
+01358  16EF                        
+01359  16EF  BD 00 60   @L1        LDA RB_COLORS1,X
+01360  16F2             
+01361  16F2  CC 12 D0              CPY $D012
+01362  16F5  D0 FB                 BNE *-3
+01363  16F7             
+01364  16F7  8D 20 D0              STA $D020
+01365  16FA  8D 21 D0              STA $D021
+01366  16FD                        
+01367  16FD  E0 18                 CPX #24
+01368  16FF  F0 05                 BEQ @XIT
+01369  1701             
+01370  1701  E8                    INX
+01371  1702  C8                    INY
+01372  1703             
+01373  1703  4C EF 16              JMP @L1
+01374  1706             
+01375  1706             @XIT
+01376  1706  60                    RTS
+01377  1707             
+01378  1707                        ;INC @L1+1
+01379  1707  AD F0 16              LDA @L1+1
+01380  170A  18                    CLC
+01381  170B  69 19                 ADC #25
+01382  170D  90 0D                 BCC @XIT2
+01383  170F             
+01384  170F  EE F1 16              INC @L1+2
+01385  1712  AE F1 16              LDX @L1+2
+01386  1715  E0 62                 CPX #>RB_COLORS1+2
+01387  1717  F0 07                 BEQ @XIT3
+01388  1719  8E F1 16              STX @L1+2
+01389  171C             
+01390  171C             @XIT2
+01391  171C  8D F0 16              STA @L1+1
+01392  171F  60                    RTS
+01393  1720             
+01394  1720  A9 00      @XIT3      LDA #<RB_COLORS1
+01395  1722  8D F0 16              STA @L1+1
+01396  1725  A9 60                 LDA #>RB_COLORS1
+01397  1727  8D F1 16              STA @L1+2
+01398  172A  60                    RTS
+01399  172B             
+01400  172B             
+01401  172B             
+01402  172B             
+01403  172B             
+01404  172B             
+01405  172B             ; --- RASTA2 ---
+01406  172B  A0 02      RASTA2     LDY #2
+01407  172D  A2 00                 LDX #$00
+01408  172F                        
+01409  172F  BD 00 63   @L1        LDA RB_COLORS2,X
+01410  1732             
+01411  1732  CC 12 D0              CPY $D012
+01412  1735  D0 FB                 BNE *-3
+01413  1737             
+01414  1737  8D 20 D0              STA $D020
+01415  173A  8D 21 D0              STA $D021
+01416  173D                        
+01417  173D  E0 1C                 CPX #28
+01418  173F  F0 05                 BEQ @XIT
+01419  1741             
+01420  1741  E8                    INX
+01421  1742  C8                    INY
+01422  1743             
+01423  1743  4C 2F 17              JMP @L1
+01424  1746             
+01425  1746             @XIT
+01426  1746  60                    RTS
+01427  1747                        ;INC @L1+1
+01428  1747  AD 30 17              LDA @L1+1
+01429  174A  18                    CLC
+01430  174B  69 1D                 ADC #29
+01431  174D  90 0D                 BCC @XIT2
+01432  174F             
+01433  174F  EE 31 17              INC @L1+2
+01434  1752  AE 31 17              LDX @L1+2
+01435  1755  E0 65                 CPX #>RB_COLORS2+2
+01436  1757  F0 07                 BEQ @XIT3
+01437  1759  8E 31 17              STX @L1+2
+01438  175C             
+01439  175C             @XIT2
+01440  175C  8D 30 17              STA @L1+1
+01441  175F  60                    RTS
+01442  1760             
+01443  1760  A9 00      @XIT3      LDA #<RB_COLORS2
+01444  1762  8D 30 17              STA @L1+1
+01445  1765  A9 63                 LDA #>RB_COLORS2
+01446  1767  8D 31 17              STA @L1+2
+01447  176A  60                    RTS
+01448  176B             
+01449  176B             
+01450  176B             
+01451  176B             
+01452  176B  5A         AC_1       BYTE 90
+01453  176C  61         AC_2       BYTE 97
+01454  176D  68         AC_3       BYTE $68
+01455  176E             
+01456  176E  02         CHAR_ANI_DELAY BYTE 2
+01457  176F             
+01458  176F             
+01459  176F             CHAR_ANI
+01460  176F  CE 6E 17              DEC CHAR_ANI_DELAY
+01461  1772  F0 01                 BEQ @DO_IT
+01462  1774  60                    RTS
+01463  1775             
+01464  1775                        
+01465  1775             @DO_IT     
+01466  1775  A9 04                 LDA #4 ;5
+01467  1777  8D 6E 17              STA CHAR_ANI_DELAY
+01468  177A             
+01469  177A  EE 6B 17              INC AC_1
+01470  177D  CE 6C 17              DEC AC_2
+01471  1780                        
+01472  1780  AD 6B 17              LDA AC_1
+01473  1783  C9 61                 CMP #97
+01474  1785  D0 0A                 BNE @GOONN
+01475  1787             
+01476  1787  A9 5A                 LDA #90
+01477  1789  8D 6B 17              STA AC_1
+01478  178C  A9 61                 LDA #97
+01479  178E  8D 6C 17              STA AC_2
+01480  1791             
+01481  1791             @GOONN
+01482  1791             
+01483  1791  EE 6D 17              INC AC_3
+01484  1794  AD 6D 17              LDA AC_3
+01485  1797  C9 6C                 CMP #$6C
+01486  1799  D0 05                 BNE @GOON2
+01487  179B             
+01488  179B  A9 68                 LDA #$68
+01489  179D  8D 6D 17              STA AC_3
+01490  17A0             
+01491  17A0             @GOON2
+01492  17A0             
+01493  17A0             ; CHAR ANI
+01494  17A0             
+01495  17A0  AD 6B 17              LDA AC_1
+01496  17A3  8D 19 06              STA CHAN1POS-1
+01497  17A6  8D 1B 06              STA CHAN1POS+1
+01498  17A9             
+01499  17A9  AD 6C 17              LDA AC_2
+01500  17AC  8D 1D 06              STA CHAN3POS-1
+01501  17AF  8D 1F 06              STA CHAN3POS+1
+01502  17B2                        
+01503  17B2  60                    RTS
+01504  17B3                        
+01505  17B3                        
+01506  17B3             
+01507  17B3             ; --- SCROLLER ---
+01508  17B3             
+01509  17B3             SCROLLER   
+01510  17B3  CE EA 17              DEC @SCROLLREG
+01511  17B6  AD EA 17              LDA @SCROLLREG
+01512  17B9  C9 FF                 CMP #$FF
+01513  17BB  F0 06                 BEQ @NEXTCHAR
+01514  17BD  8D 16 D0              STA $D016
+01515  17C0  4C CE 17              JMP @DO_PRINT
+01516  17C3             
+01517  17C3             @NEXTCHAR
+01518  17C3  A9 07                 LDA #7
+01519  17C5  8D EA 17              STA @SCROLLREG
+01520  17C8  8D 16 D0              STA $D016
+01521  17CB  EE EB 17              INC @SCROLLTEXT_POS
+01522  17CE             @DO_PRINT
+01523  17CE  AE EB 17              LDX @SCROLLTEXT_POS
+01524  17D1  A0 00                 LDY #0
+01525  17D3             @PRINTCHAR 
+01526  17D3  BD EC 17              LDA @SCROLLTEXT,X
+01527  17D6  C9 FF                 CMP #$FF
+01528  17D8  F0 0A                 BEQ @ENDSCROLL
+01529  17DA                        ;STA $4C8,Y ;$04A0,Y
+01530  17DA  99 C0 07              STA $07C0,Y
+01531  17DD                        ;STA $4F0,Y
+01532  17DD  E8                    INX
+01533  17DE  C8                    INY
+01534  17DF  C0 28                 CPY #40
+01535  17E1  D0 F0                 BNE @PRINTCHAR
+01536  17E3  60                    RTS
+01537  17E4             @ENDSCROLL 
+01538  17E4  A9 00                 LDA #0
+01539  17E6  8D EB 17              STA @SCROLLTEXT_POS
+01540  17E9  60                    RTS
+01541  17EA                        
+01542  17EA  00         @SCROLLREG BYTE 0
+01543  17EB  00         @SCROLLTEXT_POS BYTE 0
+01544  17EC  20 20 20   @SCROLLTEXT TEXT '                                        '
+01545  1814                        ;BYTE $47
+01546  1814  0D 01 12              TEXT 'MARIO64 PRESENTS  '
+01547  1826  50 00                 BYTE 80,0
+01548  1828  05 0E 04              TEXT 'ENDSTATION'
+01549  1832  00 50                 BYTE 0,80
+01550  1834             
+01551  1834  20 20 14              TEXT '  THE ENDPART MUSIC FOR THE A4 BCC#10 DEMO '
+01552  185F                        
+01553  185F  50 00                 BYTE 80,0
+01554  1861  06 12 0F              TEXT 'FROM'
+01555  1865  00                    BYTE 0
+01556  1866  02 05 12              TEXT 'BERLIN'
+01557  186C  00                    BYTE 0
+01558  186D  14 0F                 TEXT 'TO'
+01559  186F  00                    BYTE 0
+01560  1870  10 01 12              TEXT 'PARIS'
+01561  1875  00                    BYTE 0
+01562  1876  01 0E 04              TEXT 'AND'
+01563  1879  00                    BYTE 0
+01564  187A  02 01 03              TEXT 'BACK'
+01565  187E  00 50                 BYTE 0,80
+01566  1880             
+01567  1880                        ;TEXT '  SO I HAVE CODED A NEW PLAYER FOR MY MUSIC. AND TRIED TO MAKE SOME FANCY SYNC OF THE GFX AND MUSIC PLAYING '
+01568  1880  20 20 13              TEXT '  SO I HAVE CODED A NEW PLAYER FOR MY MUSIC. AND TRIED TO MAKE SOME FANCY SYNC OF THE GFX AND MUSIC PLAYING '
+01569  18EC             
+01570  18EC  50 00                 BYTE 80,0
+01571  18EE  05 0E 0A              TEXT 'ENJOY THE RIDE ...'
+01572  1900  00 50                 BYTE 0,80
+01573  1902             
+01574  1902  20 20 20              TEXT '                                        '
+01575  192A  FF FF FF              BYTE $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+01576  1932             
+01577  1932             
+01578  1932             
+01579  1932             MOVE_SCROLLCOLORS 
+01580  1932             
+01581  1932  EE 50 19              INC @SCROLLCOLPTR
+01582  1935  AE 50 19              LDX @SCROLLCOLPTR
+01583  1938  E0 40                 CPX #64
+01584  193A  D0 05                 BNE @GOON1
+01585  193C  A2 00                 LDX #0
+01586  193E  8E 50 19              STX @SCROLLCOLPTR
+01587  1941             @GOON1     
+01588  1941  A0 00                 LDY #0
+01589  1943  BD 00 28   @DOTLOOP2  LDA SCROLLCOLORS,X
+01590  1946  99 C0 DB              STA $DBC0,Y
+01591  1949  C8                    INY
+01592  194A  E8                    INX
+01593  194B  C0 28                 CPY #40
+01594  194D  D0 F4                 BNE @DOTLOOP2
+01595  194F             
+01596  194F  60                    RTS
+01597  1950                        
+01598  1950  00         @SCROLLCOLPTR BYTE 0
+01599  1951             
+01600  1951             
+01601  1951             
+01602  1951             ; --- ROUTINES -----------------------------------------------------------------
+01603  1951             
+01604  1951             LOGO_SCROLL_LR 
+01605  1951  AD 43 40              LDA SWVARS+34
+01606  1954  C9 0A                 CMP #$A
+01607  1956  B0 01                 BCS @SKIP1
+01608  1958  60                    RTS
+01609  1959             
+01610  1959             @SKIP1
+01611  1959             
+01612  1959             
+01613  1959  AD 72 5F              LDA LSR_CTR
+01614  195C  AA                    TAX
+01615  195D  BD D4 5E              LDA LSRL_TABLE1,X
+01616  1960  C9 FF                 CMP #$FF
+01617  1962  F0 09                 BEQ @END
+01618  1964                        ;STA $D016
+01619  1964             
+01620  1964  8D D3 5E              STA LSRL_BUF
+01621  1967             
+01622  1967                        ;LDA LSRL_TABLE2,X
+01623  1967                        ;STA LOGO_X
+01624  1967                        
+01625  1967  E8                    INX
+01626  1968  8A                    TXA
+01627  1969  8D 72 5F              STA LSR_CTR
+01628  196C  60                    RTS
+01629  196D             
+01630  196D  A9 00      @END       LDA #0
+01631  196F  8D 72 5F              STA LSR_CTR
+01632  1972  60                    RTS
+01633  1973                        
+01634  1973             
+01635  1973             
+01636  1973             LOGO_COLOR_ANI 
+01637  1973             ;        LDA FRAMECTR
+01638  1973             ;        CMP #8
+01639  1973             ;        BCC @DO_IT
+01640  1973             ;        RTS
+01641  1973             
+01642  1973  A9 01                 LDA #1
+01643  1975  CD 98 5F              CMP DO1
+01644  1978  F0 02                 BEQ @CONT1SET
+01645  197A  A9 00                 LDA #0
+01646  197C                        
+01647  197C             @CONT1SET
+01648  197C  48                    PHA
+01649  197D             
+01650  197D  A9 01                 LDA #1
+01651  197F  CD 99 5F              CMP DO2
+01652  1982  D0 04                 BNE @CONT2CLEAR
+01653  1984  68                    PLA
+01654  1985  09 02                 ORA #%00000010
+01655  1987  48                    PHA
+01656  1988             
+01657  1988             @CONT2CLEAR 
+01658  1988  A9 01                 LDA #1
+01659  198A  CD 9A 5F              CMP DO3
+01660  198D  D0 04                 BNE @CONT3CLEAR
+01661  198F  68                    PLA
+01662  1990  09 04                 ORA #%00000100
+01663  1992  48                    PHA
+01664  1993             
+01665  1993             @CONT3CLEAR 
+01666  1993  68                    PLA
+01667  1994             ;        CMP #0
+01668  1994             ;        BEQ @END
+01669  1994             
+01670  1994             ;        STA @LAST_SCRN
+01671  1994             
+01672  1994  AA                    TAX
+01673  1995             
+01674  1995             ;        JMP @GOOON
+01675  1995             
+01676  1995             
+01677  1995             ;
+01678  1995             
+01679  1995             
+01680  1995             
+01681  1995             ;@END    ;LDA @LAST_SCRN
+01682  1995             ;        ;CMP #0
+01683  1995             ;        ;BEQ @CLEAR
+01684  1995             
+01685  1995             ;        INC @STAY_CTR
+01686  1995             ;        LDA @STAY_CTR
+01687  1995             ;        CMP #4
+01688  1995             ;        BEQ @DOCLEAR
+01689  1995             ;
+01690  1995             ;        LDX @LAST_SCRN
+01691  1995             ;        JMP @GOOON
+01692  1995             ;
+01693  1995             
+01694  1995             ;@DOCLEAR LDA #0
+01695  1995             ;        STA @STAY_CTR
+01696  1995             ;        STA @LAST_SCRN
+01697  1995             
+01698  1995             ;@CLEAR
+01699  1995             ;        LDX #0
+01700  1995             
+01701  1995             ;@GOOON
+01702  1995             
+01703  1995  8A                    TXA
+01704  1996  0A                    ASL
+01705  1997  AA                    TAX
+01706  1998  BD 75 5F              LDA DRL_ANI_TBL,X
+01707  199B  8D 3A 1A              STA DRL_LDA_LOGO_COLOR+1
+01708  199E  E8                    INX
+01709  199F  BD 75 5F              LDA DRL_ANI_TBL,X
+01710  19A2  8D 3B 1A              STA DRL_LDA_LOGO_COLOR+2
+01711  19A5  60                    RTS
+01712  19A6             
+01713  19A6  00         @STAY_CTR  BYTE 0
+01714  19A7  00         @LAST_SCRN BYTE 0
+01715  19A8  00         @DISP_MASK BYTE 0
+01716  19A9             
+01717  19A9             
+01718  19A9             ;        LDX DRL_ANI_CTR
+01719  19A9             ;        INX
+01720  19A9             ;        CPX #7
+01721  19A9             ;        BEQ @END
+01722  19A9             ;        STX DRL_ANI_CTR
+01723  19A9             ;        TXA
+01724  19A9             ;        ASL
+01725  19A9             ;        TAX
+01726  19A9             ;        LDA DRL_ANI_TBL,X
+01727  19A9             ;        STA DRL_LDA_LOGO_COLOR+1
+01728  19A9             ;        INX
+01729  19A9             ;        LDA DRL_ANI_TBL,X
+01730  19A9             ;        STA DRL_LDA_LOGO_COLOR+2
+01731  19A9             
+01732  19A9             ;        RTS
+01733  19A9             
+01734  19A9             ;@END
+01735  19A9             ;        LDA #$FF
+01736  19A9             ;        STA DRL_ANI_CTR
+01737  19A9             ;        RTS
+01738  19A9             
+01739  19A9             
+01740  19A9             
+01741  19A9             
+01742  19A9             
+01743  19A9             
+01744  19A9             FADE_MSGS
+01745  19A9  EE 2E 1A              INC @DELAY
+01746  19AC  AD 2E 1A              LDA @DELAY
+01747  19AF  C9 03                 CMP #3
+01748  19B1  F0 01                 BEQ @GOON
+01749  19B3  60                    RTS
+01750  19B4             @GOON
+01751  19B4  A9 00                 LDA #0
+01752  19B6  8D 2E 1A              STA @DELAY
+01753  19B9             
+01754  19B9  AD 83 5D              LDA CURRENT_MSG
+01755  19BC  0A                    ASL
+01756  19BD  AA                    TAX
+01757  19BE  BD 84 5D              LDA MESSAGE_TABLE,X
+01758  19C1  8D CE 19              STA @PRINTLOOP+1
+01759  19C4  E8                    INX
+01760  19C5  BD 84 5D              LDA MESSAGE_TABLE,X
+01761  19C8  8D CF 19              STA @PRINTLOOP+2
+01762  19CB             
+01763  19CB  A2 00                 LDX #0
+01764  19CD             
+01765  19CD             @PRINTLOOP 
+01766  19CD  BD 39 5E              LDA MESSAGE1,X
+01767  19D0  C9 FF                 CMP #$FF
+01768  19D2  F0 0D                 BEQ @ENDPRINT
+01769  19D4  C9 20                 CMP #32
+01770  19D6  D0 02                 BNE @DOSTA
+01771  19D8  A9 00                 LDA #0
+01772  19DA                        
+01773  19DA             @DOSTA
+01774  19DA             
+01775  19DA  9D 05 07              STA $700+5,X
+01776  19DD                        ;STA $700-35,X
+01777  19DD  E8                    INX
+01778  19DE  4C CD 19              JMP @PRINTLOOP
+01779  19E1                        
+01780  19E1             @ENDPRINT
+01781  19E1  EE 2B 1A              INC @FADE_CTR
+01782  19E4  AD 2B 1A              LDA @FADE_CTR
+01783  19E7  C9 07                 CMP #7
+01784  19E9  D0 26                 BNE @NEXT_FADE_STEP
+01785  19EB             
+01786  19EB  A9 00                 LDA #0
+01787  19ED  8D 2B 1A              STA @FADE_CTR
+01788  19F0             
+01789  19F0  CD 2C 1A              CMP @FADE_IN_OUT
+01790  19F3  D0 14                 BNE @IN_TO_OUT ; WHEN NOT 0 ITS CURRENT FADEIN -> DO FADEOUT NOW
+01791  19F5             
+01792  19F5                        ; FADED OUT, INCREASE MSG_COUNT
+01793  19F5  A9 01                 LDA #1
+01794  19F7  8D 2C 1A              STA @FADE_IN_OUT
+01795  19FA             
+01796  19FA  EE 83 5D              INC CURRENT_MSG
+01797  19FD  AD 83 5D              LDA CURRENT_MSG
+01798  1A00                        
+01799  1A00  C9 0F                 CMP #$F
+01800  1A02             
+01801  1A02  D0 05                 BNE @IN_TO_OUT
+01802  1A04  A9 00                 LDA #0
+01803  1A06  8D 83 5D              STA CURRENT_MSG
+01804  1A09                        ;JMP @NEXT_FADE_STEP
+01805  1A09             
+01806  1A09             ;IN_TO_OUT
+01807  1A09             @IN_TO_OUT 
+01808  1A09  8D 2C 1A              STA @FADE_IN_OUT
+01809  1A0C  A9 00                 LDA #0
+01810  1A0E  4C 11 1A              JMP @NEXT_FADE_STEP
+01811  1A11             
+01812  1A11             
+01813  1A11             ; NEXT_FADE_STEP
+01814  1A11             @NEXT_FADE_STEP 
+01815  1A11  AA                    TAX
+01816  1A12  AD 2C 1A              LDA @FADE_IN_OUT
+01817  1A15  C9 00                 CMP #00
+01818  1A17  D0 06                 BNE @FADE_OUT
+01819  1A19             @FADE_IN
+01820  1A19  BD AC 5D              LDA FADE_IN_COLORS,X
+01821  1A1C  4C 22 1A              JMP @GOON1
+01822  1A1F             @FADE_OUT
+01823  1A1F  BD A4 5D              LDA FADE_OUT_COLORS,X
+01824  1A22             
+01825  1A22             @GOON1     
+01826  1A22  A2 10                 LDX #16
+01827  1A24             @LOOP1
+01828  1A24  9D 04 DB              STA $DB00+4,X
+01829  1A27  CA                    DEX
+01830  1A28  D0 FA                 BNE @LOOP1
+01831  1A2A             
+01832  1A2A             ;
+01833  1A2A             @ENDME
+01834  1A2A             
+01835  1A2A             
+01836  1A2A  60                    RTS
+01837  1A2B             
+01838  1A2B  00         @FADE_CTR  BYTE 0
+01839  1A2C             
+01840  1A2C  01         @FADE_IN_OUT BYTE 1 ; 1 IN, 0 OUT
+01841  1A2D             
+01842  1A2D  00         @FADE_STAY_CTR BYTE 0
+01843  1A2E                        
+01844  1A2E  00         @DELAY     BYTE 0
+01845  1A2F             
+01846  1A2F             
+01847  1A2F             
+01848  1A2F             DRAW_LOGO
+01849  1A2F             ;        LDA #$04
+01850  1A2F             ;        STA DRL_STA_0400+2
+01851  1A2F             ;        LDA LOGO_X
+01852  1A2F             ;        STA DRL_STA_0400+1
+01853  1A2F             
+01854  1A2F             ;        LDA #$D8
+01855  1A2F             ;        STA DRL_STA_D800+2
+01856  1A2F             ;        LDA LOGO_X
+01857  1A2F             ;        STA DRL_STA_D800+1
+01858  1A2F             
+01859  1A2F             
+01860  1A2F  A2 00                 LDX #0
+01861  1A31                        
+01862  1A31             DRL_LOOP_OUTER 
+01863  1A31  A0 18                 LDY #24
+01864  1A33             
+01865  1A33             DRL_LOOP_INNER 
+01866  1A33  BD 00 57              LDA M64LOGO_CHARS,X
+01867  1A36  9D 00 04   DRL_STA_0400 STA $0400,X
+01868  1A39             
+01869  1A39             DRL_LDA_LOGO_COLOR 
+01870  1A39  BD 00 51              LDA M64LOGO_COLOR,X
+01871  1A3C             
+01872  1A3C                        ;CMP #03
+01873  1A3C                        ;BNE DRL_STA_D800
+01874  1A3C                        ;LDA $DBC0
+01875  1A3C             
+01876  1A3C  9D 00 D8   DRL_STA_D800 STA $D800,X
+01877  1A3F             
+01878  1A3F  E8                    INX
+01879  1A40             
+01880  1A40  88                    DEY
+01881  1A41  D0 F0                 BNE DRL_LOOP_INNER
+01882  1A43             
+01883  1A43  E0 C0                 CPX #192
+01884  1A45  F0 1D                 BEQ DRL_END
+01885  1A47             
+01886  1A47  AD 37 1A              LDA DRL_STA_0400+1
+01887  1A4A                        ;CLC
+01888  1A4A  69 10                 ADC #16
+01889  1A4C  D0 03                 BNE @GOON
+01890  1A4E  EE 38 1A              INC DRL_STA_0400+2
+01891  1A51  8D 37 1A   @GOON      STA DRL_STA_0400+1
+01892  1A54             
+01893  1A54  AD 3D 1A              LDA DRL_STA_D800+1
+01894  1A57                        ;CLC
+01895  1A57  69 10                 ADC #16
+01896  1A59  D0 03                 BNE @GOON2
+01897  1A5B  EE 3E 1A              INC DRL_STA_D800+2
+01898  1A5E  8D 3D 1A   @GOON2     STA DRL_STA_D800+1
+01899  1A61             
+01900  1A61             
+01901  1A61  4C 31 1A              JMP DRL_LOOP_OUTER
+01902  1A64             
+01903  1A64             DRL_END    
+01904  1A64             
+01905  1A64  60                    RTS
+01906  1A65             
+01907  1A65             
+01908  1A65             
+01909  1A65             
+01910  1A65                        
+01911  1A65             
+01912  1A65             ; ---
+01913  1A65             
+01914  1A65             
+01915  1A65             WAITKEY
+01916  1A65  A9 00                 LDA #$0
+01917  1A67  8D 03 DC              STA $DC03       ; PORT B DDR (INPUT)
+01918  1A6A  A9 FF                 LDA #$FF
+01919  1A6C  8D 02 DC              STA $DC02       ; PORT A DDR (OUTPUT)
+01920  1A6F                        
+01921  1A6F  A9 00                 LDA #$00
+01922  1A71  8D 00 DC              STA $DC00       ; PORT A
+01923  1A74  AD 01 DC              LDA $DC01       ; PORT B
+01924  1A77  C9 FF                 CMP #$FF
+01925  1A79  F0 EA                 BEQ WAITKEY
+01926  1A7B                        
+01927  1A7B  18                    CLC
+01928  1A7C  60                    RTS
+01929  1A7D             
+01930  1A7D             
+01931  1A7D             
+01932  1A7D             PRINTSTARTMSG 
+01933  1A7D  A2 00                 LDX #00
+01934  1A7F             @LOOP
+01935  1A7F  BD 94 1A              LDA STARTMSG,X
+01936  1A82  C9 FF                 CMP #$FF
+01937  1A84  F0 0D                 BEQ @END
+01938  1A86  C0 01                 CPY #1
+01939  1A88  D0 02                 BNE @STORECHAR
+01940  1A8A  A9 20                 LDA #32
+01941  1A8C             @STORECHAR 
+01942  1A8C  9D 68 06              STA $668,X
+01943  1A8F  E8                    INX
+01944  1A90  4C 7F 1A              JMP @LOOP
+01945  1A93             @END
+01946  1A93  60                    RTS
+01947  1A94                        
+01948  1A94             
+01949  1A94             STARTMSG
+01950  1A94  08 09 14              BYTE 'HIT THE LONG ONE ...'
+01951  1AA8  FF                    BYTE $FF
+01952  1AA9             
+01953  1AA9             
+01954  1AA9             PRINTSONGMSG 
+01955  1AA9  A2 00                 LDX #00
+01956  1AAB             @LOOP
+01957  1AAB  BD C0 1A              LDA SONGMSG,X
+01958  1AAE  C9 FF                 CMP #$FF
+01959  1AB0  F0 0D                 BEQ @END
+01960  1AB2  C0 01                 CPY #1
+01961  1AB4  D0 02                 BNE @STORECHAR
+01962  1AB6  A9 20                 LDA #32
+01963  1AB8             @STORECHAR 
+01964  1AB8  9D 9A 05              STA TITLEPOS,X
+01965  1ABB  E8                    INX
+01966  1ABC  4C AB 1A              JMP @LOOP
+01967  1ABF             @END
+01968  1ABF  60                    RTS
+01969  1AC0                        
+01970  1AC0             
+01971  1AC0             SONGMSG
+01972  1AC0  10 0C 01              TEXT 'PLAYING '
+01973  1AC8  4B                    BYTE 75
+01974  1AC9  05 0E 04              TEXT 'ENDSTATION'
+01975  1AD3  4C FF                 BYTE 76, $FF
+01976  1AD5             
+01977  1AD5             
+01978  1AD5             ;-------------------------------------------------------------------------------
+01979  1AD5             ; CHARSET DATA
+01980  1AD5             *=$2000
+01981  2000             CHARSET
+01982  2000             @          
+01983  2000  00 00 00   	BYTE	0,0,0,16,0,0,0,0 
+01984  2008  10 38 64   	BYTE	16,56,100,124,100,100,100,0 
+01985  2010  78 64 64   	BYTE	120,100,100,120,100,100,120,0 
+01986  2018  38 64 60   	BYTE	56,100,96,96,96,100,56,0 
+01987  2020  78 64 64   	BYTE	120,100,100,100,100,100,120,0 
+01988  2028  7C 60 60   	BYTE	124,96,96,112,96,96,124,0 
+01989  2030  7C 60 60   	BYTE	124,96,96,112,96,96,96,0 
+01990  2038  3C 64 60   	BYTE	60,100,96,108,100,100,60,0 
+01991  2040  64 64 64   	BYTE	100,100,100,124,100,100,100,0 
+01992  2048  18 00 08   	BYTE	24,0,8,8,24,24,24,0 
+01993  2050  08 08 08   	BYTE	8,8,8,8,8,120,112,0 
+01994  2058  64 64 68   	BYTE	100,100,104,112,104,108,108,0 
+01995  2060  30 30 30   	BYTE	48,48,48,48,48,48,60,0 
+01996  2068  46 6E 56   	BYTE	70,110,86,70,102,102,102,0 
+01997  2070  44 64 54   	BYTE	68,100,84,76,100,100,100,0 
+01998  2078  38 64 64   	BYTE	56,100,100,100,100,100,56,0 
+01999  2080  78 64 64   	BYTE	120,100,100,120,96,96,96,0 
+02000  2088  38 64 64   	BYTE	56,100,100,100,108,60,2,0 
+02001  2090  78 64 64   	BYTE	120,100,100,120,104,100,100,0 
+02002  2098  3C 00 60   	BYTE	60,0,96,56,4,4,120,0 
+02003  20A0  7C 00 18   	BYTE	124,0,24,24,24,24,24,0 
+02004  20A8  64 64 64   	BYTE	100,100,100,100,100,100,56,0 
+02005  20B0  64 64 64   	BYTE	100,100,100,100,100,40,16,0 
+02006  20B8  62 62 62   	BYTE	98,98,98,98,106,118,98,0 
+02007  20C0  64 64 18   	BYTE	100,100,24,56,100,100,100,0 
+02008  20C8  64 64 64   	BYTE	100,100,100,120,48,48,48,0 
+02009  20D0  7C 04 08   	BYTE	124,4,8,16,48,96,124,0 
+02010  20D8  FF 80 9C   	BYTE	255,128,156,128,136,136,136,255 
+02011  20E0  FF 91 91   	BYTE	255,145,145,129,129,249,137,143 
+02012  20E8  FF FF E3   	BYTE	255,255,227,255,255,247,247,247 
+02013  20F0  FB FB FB   	BYTE	251,251,251,255,255,255,143,143 
+02014  20F8  FF 91 91   	BYTE	255,145,145,129,129,241,145,159 
+02015  2100  00 00 00   	BYTE	0,0,0,0,0,0,0,0 
+02016  2108  18 18 18   	BYTE	24,24,24,24,0,0,24,0 
+02017  2110  66 66 66   	BYTE	102,102,102,0,0,0,0,0 
+02018  2118  66 66 FF   	BYTE	102,102,255,102,255,102,102,0 
+02019  2120  18 3E 60   	BYTE	24,62,96,60,6,124,24,0 
+02020  2128  62 66 0C   	BYTE	98,102,12,24,48,102,70,0 
+02021  2130  3C 66 3C   	BYTE	60,102,60,56,103,102,63,0 
+02022  2138  06 0C 18   	BYTE	6,12,24,0,0,0,0,0 
+02023  2140  0C 18 30   	BYTE	12,24,48,48,48,24,12,0 
+02024  2148  30 18 0C   	BYTE	48,24,12,12,12,24,48,0 
+02025  2150  00 66 3C   	BYTE	0,102,60,255,60,102,0,0 
+02026  2158  00 18 18   	BYTE	0,24,24,126,24,24,0,0 
+02027  2160  00 00 00   	BYTE	0,0,0,0,0,24,24,48 
+02028  2168  00 00 00   	BYTE	0,0,0,126,0,0,0,0 
+02029  2170  00 00 00   	BYTE	0,0,0,0,0,24,24,0 
+02030  2178  00 03 06   	BYTE	0,3,6,12,24,48,96,0 
+02031  2180  38 04 64   	BYTE	56,4,100,108,100,100,56,0 
+02032  2188  78 18 18   	BYTE	120,24,24,24,24,24,24,0 
+02033  2190  78 0C 0C   	BYTE	120,12,12,12,48,96,124,0 
+02034  2198  78 04 04   	BYTE	120,4,4,56,12,12,120,0 
+02035  21A0  64 64 64   	BYTE	100,100,100,100,124,12,12,0 
+02036  21A8  7C 60 78   	BYTE	124,96,120,4,4,4,120,0 
+02037  21B0  3C 40 78   	BYTE	60,64,120,100,100,100,60,0 
+02038  21B8  7C 04 0C   	BYTE	124,4,12,24,24,24,24,0 
+02039  21C0  38 64 64   	BYTE	56,100,100,56,100,100,56,0 
+02040  21C8  38 64 64   	BYTE	56,100,100,60,4,4,56,0 
+02041  21D0  00 00 18   	BYTE	0,0,24,0,0,24,0,0 
+02042  21D8  00 00 18   	BYTE	0,0,24,0,0,24,24,48 
+02043  21E0  0E 18 30   	BYTE	14,24,48,96,48,24,14,0 
+02044  21E8  00 00 7E   	BYTE	0,0,126,0,126,0,0,0 
+02045  21F0  70 18 0C   	BYTE	112,24,12,6,12,24,112,0 
+02046  21F8  3C 66 06   	BYTE	60,102,6,12,24,0,24,0 
+02047  2200  FF FF FF   	BYTE	255,255,255,255,255,255,255,255 
+02048  2208  FF FF FF   	BYTE	255,255,255,255,255,255,0,0 
+02049  2210  FF FF FF   	BYTE	255,255,255,255,255,0,0,0 
+02050  2218  00 00 00   	BYTE	0,0,0,255,255,0,0,0 
+02051  2220  00 00 FF   	BYTE	0,0,255,255,0,0,0,0 
+02052  2228  00 FF FF   	BYTE	0,255,255,0,0,0,0,0 
+02053  2230  FF FF FF   	BYTE	255,255,255,255,255,255,255,255 
+02054  2238  FF FF C3   	BYTE	255,255,195,219,219,195,255,255 
+02055  2240  DB 81 00   	BYTE	219,129,0,129,0,129,129,219 
+02056  2248  FF 80 80   	BYTE	255,128,128,136,136,136,128,255 
+02057  2250  FF 81 81   	BYTE	255,129,129,129,241,145,145,159 
+02058  2258  00 03 07   	BYTE	0,3,7,7,3,0,0,0 
+02059  2260  00 C0 E0   	BYTE	0,192,224,224,192,0,0,0 
+02060  2268  04 04 0A   	BYTE	4,4,10,145,80,32,32,0 
+02061  2270  00 20 20   	BYTE	0,32,32,80,145,10,4,4 
+02062  2278  FF FF C0   	BYTE	255,255,192,192,192,192,192,192 
+02063  2280  00 18 3C   	BYTE	0,24,60,60,24,0,0,0 
+02064  2288  00 00 18   	BYTE	0,0,24,24,0,0,0,0 
+02065  2290  00 18 3C   	BYTE	0,24,60,60,24,0,0,0 
+02066  2298  00 00 18   	BYTE	0,0,24,24,0,0,0,0 
+02067  22A0  00 00 00   	BYTE	0,0,0,8,0,0,0,0 
+02068  22A8  00 00 00   	BYTE	0,0,0,8,0,0,0,0 
+02069  22B0  C3 E7 7E   	BYTE	195,231,126,60,60,126,231,195 
+02070  22B8  00 3C 7E   	BYTE	0,60,126,102,102,126,60,0 
+02071  22C0  36 7F 7F   	BYTE	54,127,127,127,62,28,8,0 
+02072  22C8  06 06 06   	BYTE	6,6,6,6,6,6,6,6 
+02073  22D0  04 04 0A   	BYTE	4,4,10,145,80,32,32,0 
+02074  22D8  08 08 14   	BYTE	8,8,20,35,160,64,64,0 
+02075  22E0  10 10 28   	BYTE	16,16,40,70,65,128,128,0 
+02076  22E8  20 20 50   	BYTE	32,32,80,140,130,1,1,0 
+02077  22F0  40 40 A0   	BYTE	64,64,160,25,5,2,2,0 
+02078  22F8  80 80 41   	BYTE	128,128,65,50,10,4,4,0 
+02079  2300  01 01 82   	BYTE	1,1,130,100,20,8,8,0 
+02080  2308  02 02 05   	BYTE	2,2,5,200,40,16,16,0 
+02081  2310  04 04 0A   	BYTE	4,4,10,145,80,32,32,0 
+02082  2318  00 00 06   	BYTE	0,0,6,137,80,32,0,0 
+02083  2320  04 04 0A   	BYTE	4,4,10,145,80,32,32,0 
+02084  2328  C0 C0 C0   	BYTE	192,192,192,192,192,192,192,192 
+02085  2330  CC CC 33   	BYTE	204,204,51,51,204,204,51,51 
+02086  2338  03 03 03   	BYTE	3,3,3,3,3,3,3,3 
+02087  2340  DB 81 00   	BYTE	219,129,0,195,0,129,129,219 
+02088  2348  ED 01 81   	BYTE	237,1,129,36,129,128,129,183 
+02089  2350  76 81 01   	BYTE	118,129,1,153,128,129,128,111 
+02090  2358  BB 00 81   	BYTE	187,0,129,165,129,128,1,222 
+02091  2360             @          
+02092  2360             INCBIN     "CHARS.CST",0,107
+02093  2360             
+02094  2360             
+02095  2360             *          = $2400
+02096  2400             SPRDATA_0XF 
+02097  2400             @          
+02098  2400  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02099  2408  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02100  2410  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$20,$00
+02101  2418  00 B8 00              BYTE $00,$B8,$00,$00,$98,$00,$00,$98
+02102  2420  00 00 20              BYTE $00,$00,$20,$00,$00,$00,$00,$00
+02103  2428  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02104  2430  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02105  2438  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02106  2440  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02107  2448  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02108  2450  00 00 00              BYTE $00,$00,$00,$28,$00,$00,$96,$00
+02109  2458  00 B6 00              BYTE $00,$B6,$00,$00,$96,$00,$00,$96
+02110  2460  00 00 96              BYTE $00,$00,$96,$00,$00,$28,$00,$00
+02111  2468  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02112  2470  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02113  2478  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02114  2480  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02115  2488  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02116  2490  00 00 00              BYTE $00,$00,$00,$A8,$00,$02,$56,$00
+02117  2498  02 76 00              BYTE $02,$76,$00,$02,$D6,$00,$02,$56
+02118  24A0  00 02 56              BYTE $00,$02,$56,$00,$02,$56,$00,$00
+02119  24A8  A8 00 00              BYTE $A8,$00,$00,$00,$00,$00,$00,$00
+02120  24B0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02121  24B8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02122  24C0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02123  24C8  00 00 00              BYTE $00,$00,$00,$00,$00,$A8,$00,$02
+02124  24D0  56 00 02              BYTE $56,$00,$02,$56,$00,$09,$F5,$80
+02125  24D8  09 D5 80              BYTE $09,$D5,$80,$09,$55,$80,$09,$55
+02126  24E0  80 09 55              BYTE $80,$09,$55,$80,$09,$55,$80,$02
+02127  24E8  56 00 02              BYTE $56,$00,$02,$56,$00,$00,$A8,$00
+02128  24F0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02129  24F8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02130  2500  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02131  2508  00 00 A8              BYTE $00,$00,$A8,$00,$02,$56,$00,$09
+02132  2510  55 80 09              BYTE $55,$80,$09,$D5,$80,$27,$55,$60
+02133  2518  27 55 60              BYTE $27,$55,$60,$25,$55,$60,$25,$55
+02134  2520  60 25 55              BYTE $60,$25,$55,$60,$25,$55,$60,$09
+02135  2528  55 80 09              BYTE $55,$80,$09,$55,$80,$02,$56,$00
+02136  2530  00 A8 00              BYTE $00,$A8,$00,$00,$00,$00,$00,$00
+02137  2538  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02138  2540  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02139  2548  00 00 00              BYTE $00,$00,$00,$00,$00,$A8,$00,$02
+02140  2550  56 00 02              BYTE $56,$00,$02,$56,$00,$09,$F5,$80
+02141  2558  09 D5 80              BYTE $09,$D5,$80,$09,$55,$80,$09,$55
+02142  2560  80 09 55              BYTE $80,$09,$55,$80,$09,$55,$80,$02
+02143  2568  56 00 02              BYTE $56,$00,$02,$56,$00,$00,$A8,$00
+02144  2570  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02145  2578  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02146  2580  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02147  2588  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02148  2590  00 00 00              BYTE $00,$00,$00,$A8,$00,$02,$56,$00
+02149  2598  02 76 00              BYTE $02,$76,$00,$02,$D6,$00,$02,$56
+02150  25A0  00 02 56              BYTE $00,$02,$56,$00,$02,$56,$00,$00
+02151  25A8  A8 00 00              BYTE $A8,$00,$00,$00,$00,$00,$00,$00
+02152  25B0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02153  25B8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02154  25C0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02155  25C8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02156  25D0  00 00 00              BYTE $00,$00,$00,$28,$00,$00,$96,$00
+02157  25D8  00 B6 00              BYTE $00,$B6,$00,$00,$96,$00,$00,$96
+02158  25E0  00 00 96              BYTE $00,$00,$96,$00,$00,$28,$00,$00
+02159  25E8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02160  25F0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02161  25F8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02162  2600             
+02163  2600             @          
+02164  2600             INCBIN     "M64.SPT",1,8,TRUE
+02165  2600             
+02166  2600             
+02167  2600             *          = $2600
+02168  2600             SPRDATA_SMALL 
+02169  2600             @          
+02170  2600  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$3F
+02171  2608  C0 00 7F              BYTE $C0,$00,$7F,$80,$00,$E7,$00,$01
+02172  2610  CE 00 03              BYTE $CE,$00,$03,$9C,$00,$07,$3E,$00
+02173  2618  0E 67 00              BYTE $0E,$67,$00,$1C,$F3,$80,$38,$01
+02174  2620  C0 7F FC              BYTE $C0,$7F,$FC,$E0,$FF,$FE,$70,$00
+02175  2628  07 F8 00              BYTE $07,$F8,$00,$03,$FC,$00,$00,$00
+02176  2630  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02177  2638  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02178  2640  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02179  2648  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02180  2650  00 00 00              BYTE $00,$00,$00,$28,$00,$00,$96,$00
+02181  2658  00 B6 00              BYTE $00,$B6,$00,$00,$96,$00,$00,$96
+02182  2660  00 00 96              BYTE $00,$00,$96,$00,$00,$28,$00,$00
+02183  2668  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02184  2670  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02185  2678  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02186  2680  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02187  2688  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02188  2690  00 00 00              BYTE $00,$00,$00,$A8,$00,$02,$56,$00
+02189  2698  02 76 00              BYTE $02,$76,$00,$02,$D6,$00,$02,$56
+02190  26A0  00 02 56              BYTE $00,$02,$56,$00,$02,$56,$00,$00
+02191  26A8  A8 00 00              BYTE $A8,$00,$00,$00,$00,$00,$00,$00
+02192  26B0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02193  26B8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02194  26C0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02195  26C8  00 00 00              BYTE $00,$00,$00,$00,$00,$A8,$00,$02
+02196  26D0  56 00 02              BYTE $56,$00,$02,$56,$00,$09,$F5,$80
+02197  26D8  09 D5 80              BYTE $09,$D5,$80,$09,$55,$80,$09,$55
+02198  26E0  80 09 55              BYTE $80,$09,$55,$80,$09,$55,$80,$02
+02199  26E8  56 00 02              BYTE $56,$00,$02,$56,$00,$00,$A8,$00
+02200  26F0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02201  26F8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02202  2700  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02203  2708  00 00 A8              BYTE $00,$00,$A8,$00,$02,$56,$00,$09
+02204  2710  55 80 09              BYTE $55,$80,$09,$D5,$80,$27,$55,$60
+02205  2718  27 55 60              BYTE $27,$55,$60,$25,$55,$60,$25,$55
+02206  2720  60 25 55              BYTE $60,$25,$55,$60,$25,$55,$60,$09
+02207  2728  55 80 09              BYTE $55,$80,$09,$55,$80,$02,$56,$00
+02208  2730  00 A8 00              BYTE $00,$A8,$00,$00,$00,$00,$00,$00
+02209  2738  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02210  2740  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02211  2748  00 00 00              BYTE $00,$00,$00,$00,$00,$A8,$00,$02
+02212  2750  56 00 02              BYTE $56,$00,$02,$56,$00,$09,$F5,$80
+02213  2758  09 D5 80              BYTE $09,$D5,$80,$09,$55,$80,$09,$55
+02214  2760  80 09 55              BYTE $80,$09,$55,$80,$09,$55,$80,$02
+02215  2768  56 00 02              BYTE $56,$00,$02,$56,$00,$00,$A8,$00
+02216  2770  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02217  2778  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02218  2780  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02219  2788  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02220  2790  00 00 00              BYTE $00,$00,$00,$A8,$00,$02,$56,$00
+02221  2798  02 76 00              BYTE $02,$76,$00,$02,$D6,$00,$02,$56
+02222  27A0  00 02 56              BYTE $00,$02,$56,$00,$02,$56,$00,$00
+02223  27A8  A8 00 00              BYTE $A8,$00,$00,$00,$00,$00,$00,$00
+02224  27B0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02225  27B8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02226  27C0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02227  27C8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02228  27D0  00 00 00              BYTE $00,$00,$00,$28,$00,$00,$96,$00
+02229  27D8  00 B6 00              BYTE $00,$B6,$00,$00,$96,$00,$00,$96
+02230  27E0  00 00 96              BYTE $00,$00,$96,$00,$00,$28,$00,$00
+02231  27E8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02232  27F0  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02233  27F8  00 00 00              BYTE $00,$00,$00,$00,$00,$00,$00,$00
+02234  2800             
+02235  2800             @          
+02236  2800             INCBIN     "M64A4.SPT",1,8,TRUE
+02237  2800             
+02238  2800             
+02239  2800             SCROLLCOLORS 
+02240  2800  0B 0B 0C              BYTE 11, 11, 12, 12, 4, 4, 12, 12, 14, 14, 3, 3, 1, 1  ; 14
+02241  280E  01 01 03              BYTE 1, 1, 3, 3, 14, 14, 12, 12, 4, 4, 12, 12, 11, 11  ; 14
+02242  281C             
+02243  281C  0B 05 0D              BYTE 11, 5, 13, 3, 1, 3, 13, 11                        ;  8
+02244  2824  00 0B 02              BYTE 0, 11, 2, 10, 1, 10, 2, 11                        ;  8
+02245  282C                        
+02246  282C  0B 0B 04              BYTE 11, 11, 4, 4, 10, 10, 7, 7, 1, 1                  ; 10
+02247  2836  01 01 07              BYTE 1, 1, 7, 7, 10, 10, 4, 4, 11, 11                  ; 10
+02248  2840             
+02249  2840             
+02250  2840             
+02251  2840             
+02252  2840  0B 0B 0C              BYTE 11, 11, 12, 12, 4, 4, 12, 12, 14, 14, 3, 3, 1, 1  ; 14
+02253  284E  01 01 03              BYTE 1, 1, 3, 3, 14, 14, 12, 12, 4, 4, 12, 12, 11, 11  ; 14
+02254  285C             
+02255  285C  0B 05 0D              BYTE 11, 5, 13, 3, 1, 3, 13, 11                        ;  8
+02256  2864  00 0B 02              BYTE 0, 11, 2, 10, 1, 10, 2, 11                        ;  8
+02257  286C                        
+02258  286C  0B 0B 04              BYTE 11, 11, 4, 4, 10, 10, 7, 7, 1, 1                  ; 10
+02259  2876  01 01 07              BYTE 1, 1, 7, 7, 10, 10, 4, 4, 11, 11                  ; 10
+02260  2880             
+02261  2880             
+02262  2880             
+02263  2880             
+02264  2880             
+02265  2880             
+02266  2880  01 01 01              BYTE 1,1,1,1,1,1,1,1
+02267  2888             
+02268  2888             DOTCOLORS
+02269  2888  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02270  2898  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02271  28A8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02272  28B8  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02273  28C8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02274  28D8  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02275  28E8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02276  28F8  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02277  2908             
+02278  2908  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02279  2918  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02280  2928  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02281  2938  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02282  2948  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02283  2958  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02284  2968  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02285  2978  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02286  2988             
+02287  2988  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02288  2998  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02289  29A8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02290  29B8  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02291  29C8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02292  29D8  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02293  29E8  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02294  29F8  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02295  2A08             
+02296  2A08  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02297  2A18  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02298  2A28  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 13, 13, 13, 13, 5, 5, 5, 5
+02299  2A38  0B 0B 0B              BYTE 11, 11, 11, 11, 5, 5, 5, 5, 13, 13, 13, 13, 15, 15, 15, 15
+02300  2A48  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02301  2A58  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02302  2A68  01 01 01              BYTE 1, 1, 1, 1, 15, 15, 15, 15, 14, 14, 14, 14, 6, 6, 6, 6
+02303  2A78  0B 0B 0B              BYTE 11, 11, 11, 11, 6, 6, 6, 6, 14, 14, 14, 14, 15, 15, 15, 15
+02304  2A88             
+02305  2A88             
+02306  2A88             ; SOUND DATA
+02307  2A88             *=$4000
+02308  4000             INCBIN     "ENDP0062.SID", $7E
+02309  507C             ;-------------------------------------------------------------------------------
+02310  507C  00         ENDSID     BYTE 0
+02311  507D             
+02312  507D             *=$5100
+02313  5100             M64LOGO_COLOR 
+02314  5100             M64LOGO_COLOR0 
+02315  5100             ; SCREEN 1 - COLOUR DATA
+02316  5100  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02317  5118  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02318  5130  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01,$01,$01,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02319  5148  0F 0E 0E              BYTE    $0F,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0F
+02320  5160  0C 0E 0E              BYTE    $0C,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0C
+02321  5178  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$01,$01,$01,$01,$0E,$0E,$0E,$0B
+02322  5190  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0B,$03,$06,$03,$01,$0E,$0E,$0E,$0B
+02323  51A8  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02324  51C0             M64LOGO_COLOR1 
+02325  51C0             ; SCREEN 2 - COLOUR DATA
+02326  51C0  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02327  51D8  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02328  51F0  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$01,$01,$01,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02329  5208  0F 03 03              BYTE    $0F,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0F
+02330  5220  0C 03 03              BYTE    $0C,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0C
+02331  5238  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$01,$01,$01,$01,$0E,$0E,$0E,$0B
+02332  5250  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0B,$03,$06,$03,$01,$0E,$0E,$0E,$0B
+02333  5268  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02334  5280             M64LOGO_COLOR2 
+02335  5280             ; SCREEN 3 - COLOUR DATA
+02336  5280  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02337  5298  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02338  52B0  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$01,$01,$01,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02339  52C8  0F 0E 0E              BYTE    $0F,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0F
+02340  52E0  0C 0E 0E              BYTE    $0C,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0C
+02341  52F8  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$01,$01,$01,$01,$01,$0E,$0E,$0E,$0B
+02342  5310  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$0B,$03,$06,$03,$01,$0E,$0E,$0E,$0B
+02343  5328  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02344  5340             M64LOGO_COLOR3 
+02345  5340             ; SCREEN 4 - COLOUR DATA
+02346  5340  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02347  5358  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02348  5370  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$01,$01,$01,$01,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01
+02349  5388  0F 03 03              BYTE    $0F,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0F
+02350  53A0  0C 03 03              BYTE    $0C,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$01,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$0C
+02351  53B8  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$01,$03,$03,$01,$01,$01,$01,$01,$0E,$0E,$0E,$0B
+02352  53D0  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$03,$03,$03,$0B,$03,$06,$03,$01,$0E,$0E,$0E,$0B
+02353  53E8  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02354  5400             M64LOGO_COLOR4 
+02355  5400             ; SCREEN 5 - DRL_LDA_LOGO_COLORCOLOUR DATA
+02356  5400  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02357  5418  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02358  5430  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$01,$01,$01,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02359  5448  0F 0E 0E              BYTE    $0F,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$03,$0F
+02360  5460  0C 0E 0E              BYTE    $0C,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$03,$0C
+02361  5478  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$01,$01,$01,$01,$03,$03,$03,$0B
+02362  5490  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0B,$03,$06,$03,$01,$03,$03,$03,$0B
+02363  54A8  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02364  54C0             M64LOGO_COLOR5 
+02365  54C0             ; SCREEN 6 - COLOUR DATA
+02366  54C0  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02367  54D8  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02368  54F0  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$01,$01,$01,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02369  5508  0F 03 03              BYTE    $0F,$03,$03,$03,$03,$03,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$03,$0F
+02370  5520  0C 03 03              BYTE    $0C,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$03,$0C
+02371  5538  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$01,$0E,$0E,$01,$01,$01,$01,$01,$03,$03,$03,$0B
+02372  5550  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$0E,$0E,$0E,$0E,$0E,$0E,$0B,$03,$06,$03,$01,$03,$03,$03,$0B
+02373  5568  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02374  5580             M64LOGO_COLOR6 
+02375  5580             ; SCREEN 7 - COLOUR DATA
+02376  5580  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02377  5598  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02378  55B0  01 0E 0E              BYTE    $01,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$01,$01,$01,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02379  55C8  0F 0E 0E              BYTE    $0F,$0E,$0E,$0E,$0E,$0E,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$03,$0F
+02380  55E0  0C 0E 0E              BYTE    $0C,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$01,$03,$03,$03,$03,$03,$03,$03,$0C
+02381  55F8  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$01,$03,$03,$01,$01,$01,$01,$01,$03,$03,$03,$0B
+02382  5610  0B 0E 0E              BYTE    $0B,$0E,$0E,$01,$0E,$01,$0E,$0E,$01,$03,$03,$03,$03,$03,$03,$0B,$03,$06,$03,$01,$03,$03,$03,$0B
+02383  5628  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02384  5640             M64LOGO_COLOR7 
+02385  5640             ; SCREEN 8 - COLOUR DATA
+02386  5640  01 01 01              BYTE    $01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01,$01
+02387  5658  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02388  5670  01 03 03              BYTE    $01,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$01,$01,$01,$01,$03,$03,$03,$01,$03,$03,$03,$01
+02389  5688  0F 03 03              BYTE    $0F,$03,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$01,$03,$03,$03,$03,$03,$03,$03,$0F
+02390  56A0  0C 03 03              BYTE    $0C,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$01,$03,$03,$01,$03,$03,$03,$03,$03,$03,$03,$0C
+02391  56B8  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$01,$03,$03,$01,$01,$01,$01,$01,$03,$03,$03,$0B
+02392  56D0  0B 03 03              BYTE    $0B,$03,$03,$01,$03,$01,$03,$03,$01,$03,$03,$03,$03,$03,$03,$0B,$03,$06,$03,$01,$03,$03,$03,$0B
+02393  56E8  0B 0B 0B              BYTE    $0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$0B,$03,$03,$03,$01,$0B,$0B,$0B,$0B
+02394  5700             M64LOGO_CHARS 
+02395  5700             ; SCREEN 1 -
+02396  5700  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02397  5718  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02398  5730  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02399  5748  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02400  5760  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02401  5778  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46
+02402  5790  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$20,$20,$20,$46,$46,$46,$46,$46
+02403  57A8  46 46 46              BYTE    $46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$46,$20,$20,$20,$46,$46,$46,$46,$46
+02404  57C0             
+02405  57C0                        
+02406  57C0                        
+02407  57C0             ALIGN      256
+02408  5800  35 35 35   SIN_X3     BYTE 53, 53, 53, 54, 54, 55, 55, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 55, 55, 54, 54, 53, 53, 53, 52, 52, 51, 51, 50, 50, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 50, 50, 51, 51, 52, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 56, 55, 55, 54, 54, 53, 53, 53, 52, 52, 51, 51, 50, 50, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 49, 50, 50, 51, 51, 52, 52
+02409  5864             
+02410  5864             ALIGN      256
+02411  5900  9D A1 A5   SIN_X4     BYTE 157, 161, 165, 169, 173, 177, 180, 184, 187, 191, 194, 197, 200, 202, 205, 207, 209, 210, 212, 213, 214, 214, 214, 214, 214, 214, 213, 212, 210, 209, 207, 205, 202, 200, 197, 194, 191, 187, 184, 180, 177, 173, 169, 165, 161, 157, 153, 149, 145, 141, 137, 134, 130, 127, 123, 120, 117, 114, 112, 109, 107, 105, 104, 102, 101, 100, 100, 100, 100, 100, 100, 101, 102, 104, 105, 107, 109, 112, 114, 117, 120, 123, 127, 130, 134, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 180, 184, 187, 191, 194, 197, 200, 202, 205, 207, 209, 210, 212, 213, 214, 214, 214, 214, 214, 214, 213, 212, 210, 209, 207, 205, 202, 200, 197, 194, 191, 187, 184, 180, 177, 173, 169, 165, 161, 157, 153, 149, 145, 141, 137, 134, 130, 127, 123, 120, 117, 114, 112, 109, 107, 105, 104, 102, 101, 100, 100, 100, 100, 100, 100, 101, 102, 104, 105, 107, 109, 112, 114, 117, 120, 123, 127, 130, 134, 137, 141, 145, 149, 153
+02412  59B4             
+02413  59B4             ALIGN      256
+02414  5A00  9D A3 A9   SIN_X2     BYTE 157, 163, 169, 175, 181, 187, 193, 199, 204, 209, 214, 219, 224, 228, 232, 236, 239, 242, 245, 248, 250, 251, 253, 254, 254, 254, 254, 254, 253, 251, 250, 248, 245, 242, 239, 236, 232, 228, 224, 219, 214, 209, 204, 199, 193, 187, 181, 175, 169, 163, 157, 151, 145, 139, 133, 127, 121, 115, 110, 105, 100, 95, 90, 86, 82, 78, 75, 72, 69, 66, 64, 63, 61, 60, 60, 60, 60, 60, 61, 63, 64, 66, 69, 72, 75, 78, 82, 86, 90, 95, 100, 105, 110, 115, 121, 127, 133, 139, 145, 151, 157, 163, 169, 175, 181, 187, 193, 199, 204, 209, 214, 219, 224, 228, 232, 236, 239, 242, 245, 248, 250, 251, 253, 254, 254, 254, 254, 254, 253, 251, 250, 248, 245, 242, 239, 236, 232, 228, 224, 219, 214, 209, 204, 199, 193, 187, 181, 175, 169, 163, 157, 151, 145, 139, 133, 127, 121, 115, 110, 105, 100, 95, 90, 86, 82, 78, 75, 72, 69, 66, 64, 63, 61, 60, 60, 60, 60, 60, 61, 63, 64, 66, 69, 72, 75, 78, 82, 86, 90, 95, 100, 105, 110, 115, 121, 127, 133, 139, 145, 151
+02415  5AC8  00 00 00              BYTE 0, 0, 0, 0, 0, 0, 0, 0
+02416  5AD0             
+02417  5AD0             ALIGN      256
+02418  5B00  DC DB DB   SIN_X5     BYTE 220, 219, 219, 219, 218, 217, 216, 214, 213, 211, 209, 207, 205, 202, 200, 197, 195, 192, 189, 186, 183, 180, 177, 174, 171, 169, 166, 163, 160, 158, 155, 153, 151, 149, 147, 145, 144, 143, 142, 141, 140, 140, 140, 140, 140, 140, 141, 142, 143, 144, 145, 147, 149, 151, 153, 155, 158, 160, 163, 166, 169, 171, 174, 177, 180, 183, 186, 189, 192, 195, 197, 200, 202, 205, 207, 209, 211, 213, 214, 216, 217, 218, 219, 219, 219, 219, 219, 219, 219, 218, 217, 216, 214, 213, 211, 209, 207, 205, 202, 200, 197, 195, 192, 189, 186, 183, 180, 177, 174, 171, 169, 166, 163, 160, 158, 155, 153, 151, 149, 147, 145, 144, 143, 142, 141, 140, 140, 140, 140, 140, 140, 141, 142, 143, 144, 145, 147, 149, 151, 153, 155, 158, 160, 163, 166, 169, 171, 174, 177, 180, 183, 186, 189, 192, 195, 197, 200, 202, 205, 207, 209, 211, 213, 214, 216, 217, 218, 219, 219, 219
+02419  5BAA  DC DB DB              BYTE 220, 219, 219, 219, 218, 217, 216, 214, 213, 211, 209, 207, 205, 202, 200, 197, 195, 192, 189, 186, 183, 180, 177, 174, 171, 169, 166, 163, 160, 158, 155, 153, 151, 149, 147, 145, 144, 143, 142, 141, 140, 140, 140, 140, 140, 140, 141, 142, 143, 144, 145, 147, 149, 151, 153, 155, 158, 160, 163, 166, 169, 171, 174, 177, 180, 183, 186, 189, 192, 195, 197, 200, 202, 205, 207, 209, 211, 213, 214, 216, 217, 218, 219, 219, 219, 219, 219, 219, 219, 218, 217, 216, 214, 213, 211, 209, 207, 205, 202, 200, 197, 195, 192, 189, 186, 183, 180, 177, 174, 171, 169, 166, 163, 160, 158, 155, 153, 151, 149, 147, 145, 144, 143, 142, 141, 140, 140, 140, 140, 140, 140, 141, 142, 143, 144, 145, 147, 149, 151, 153, 155, 158, 160, 163, 166, 169, 171, 174, 177, 180, 183, 186, 189, 192, 195, 197, 200, 202, 205, 207, 209, 211, 213, 214, 216, 217, 218, 219, 219, 219
+02420  5C54                        
+02421  5C54             ALIGN      256
+02422  5D00  B8 BE C4   SIN_X1     BYTE 184, 190, 196, 202, 208, 213, 219, 224, 228, 232, 235, 238, 241, 242, 243, 243, 243, 242, 241, 238, 235, 232, 228, 224, 219, 214, 208, 202, 196, 190, 184, 177, 171, 165, 159, 154, 148, 143, 139, 135, 132, 129, 126, 125, 124, 124, 124, 125, 126, 129, 132, 135, 139, 143, 148, 153, 159, 165, 171, 177, 183, 190, 196, 202, 208, 213, 219, 224, 228, 232, 235, 238, 241, 242, 243, 243, 243, 242, 241, 238, 235, 232, 228, 224, 219, 214, 208, 202, 196, 190, 184, 177, 171, 165, 159, 154, 148, 143, 139, 135, 132, 129, 126, 125, 124, 124, 124, 125, 126, 129, 132, 135, 139, 143, 148, 153, 159, 165, 171, 177,0,0,0
+02423  5D7B             
+02424  5D7B  00 00 00              BYTE 0,0,0,0,0,0,0,0
+02425  5D83             
+02426  5D83             
+02427  5D83             
+02428  5D83  00         CURRENT_MSG BYTE 0
+02429  5D84             
+02430  5D84             MESSAGE_TABLE 
+02431  5D84  39                    BYTE <MESSAGE1
+02432  5D85  5E                    BYTE >MESSAGE1
+02433  5D86  4A                    BYTE <MESSAGE2
+02434  5D87  5E                    BYTE >MESSAGE2
+02435  5D88  39                    BYTE <MESSAGE1
+02436  5D89  5E                    BYTE >MESSAGE1
+02437  5D8A  5B                    BYTE <MESSAGE3
+02438  5D8B  5E                    BYTE >MESSAGE3
+02439  5D8C  39                    BYTE <MESSAGE1
+02440  5D8D  5E                    BYTE >MESSAGE1
+02441  5D8E  6C                    BYTE <MESSAGE4
+02442  5D8F  5E                    BYTE >MESSAGE4
+02443  5D90  39                    BYTE <MESSAGE1
+02444  5D91  5E                    BYTE >MESSAGE1
+02445  5D92  7D                    BYTE <MESSAGE5
+02446  5D93  5E                    BYTE >MESSAGE5
+02447  5D94  39                    BYTE <MESSAGE1
+02448  5D95  5E                    BYTE >MESSAGE1
+02449  5D96  8E                    BYTE <MESSAGE6
+02450  5D97  5E                    BYTE >MESSAGE6
+02451  5D98  39                    BYTE <MESSAGE1
+02452  5D99  5E                    BYTE >MESSAGE1
+02453  5D9A  9F                    BYTE <MESSAGE7
+02454  5D9B  5E                    BYTE >MESSAGE7
+02455  5D9C  39                    BYTE <MESSAGE1
+02456  5D9D  5E                    BYTE >MESSAGE1
+02457  5D9E  B0                    BYTE <MESSAGE8
+02458  5D9F  5E                    BYTE >MESSAGE8
+02459  5DA0  39                    BYTE <MESSAGE1
+02460  5DA1  5E                    BYTE >MESSAGE1
+02461  5DA2             
+02462  5DA2  00 00                 BYTE 00,00
+02463  5DA4             
+02464  5DA4  00 0B 06   FADE_OUT_COLORS BYTE 0,11,6,14,3,15,1,1
+02465  5DAC  01 01 0F   FADE_IN_COLORS BYTE 1,1,15,3,14,6,11,0,0,0,0,0,0
+02466  5DB9             
+02467  5DB9             ;TITLE_FADE1     BYTE 12, 11, 4, 6, 14, 3, 1, 1, 1, 3, 14, 6, 4, 11, 12, 12
+02468  5DB9             ;                BYTE 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02469  5DB9             ;                BYTE 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02470  5DB9             ;                BYTE 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02471  5DB9             
+02472  5DB9             ;TITLE_FADE2     BYTE 12, 12, 12, 12, 12, 12, 12, 12, 11, 4, 6, 14, 3, 1, 1, 1
+02473  5DB9             ;                BYTE 3, 14, 6, 4, 11, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02474  5DB9             ;                BYTE 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02475  5DB9             ;                BYTE 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
+02476  5DB9             ;
+02477  5DB9             
+02478  5DB9  01 0B 04   TITLE_FADE1 BYTE 1, 11, 4, 6, 14, 3, 1, 1, 1, 3, 14, 6, 4, 11, 4, 4
+02479  5DC9  04 04 04              BYTE 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02480  5DD9  04 04 04              BYTE 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02481  5DE9  04 04 04              BYTE 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02482  5DF9             
+02483  5DF9  04 04 04   TITLE_FADE2 BYTE 4, 4, 4, 4, 4, 4, 11, 4, 6, 14, 3, 1, 1, 1
+02484  5E07  03 0E 06              BYTE 3, 14, 6, 4, 11, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02485  5E19  04 04 04              BYTE 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02486  5E29  04 04 04              BYTE 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4
+02487  5E39             
+02488  5E39             
+02489  5E39             
+02490  5E39  20 20 20   MESSAGE1   TEXT '                '
+02491  5E49  FF                    BYTE $FF
+02492  5E4A             
+02493  5E4A             
+02494  5E4A  20 20 20   MESSAGE2   TEXT '    ATLANTIS    '
+02495  5E5A  FF                    BYTE $FF
+02496  5E5B             
+02497  5E5B  20 20 20   MESSAGE3   TEXT '      F4CG      '
+02498  5E6B  FF                    BYTE $FF
+02499  5E6C             
+02500  5E6C  20 20 20   MESSAGE4   TEXT '       '
+02501  5E73  1B 1C                 BYTE 27, 28
+02502  5E75  20 20 20              TEXT '       '
+02503  5E7C  FF                    BYTE $FF
+02504  5E7D             
+02505  5E7D  20 20 20   MESSAGE5   TEXT '    MARIO64     '
+02506  5E8D  FF                    BYTE $FF
+02507  5E8E             
+02508  5E8E  20 20 20   MESSAGE6   TEXT '    PRESENTS    '
+02509  5E9E  FF                    BYTE $FF
+02510  5E9F             
+02511  5E9F  20 20 20   MESSAGE7   TEXT '   ENDSTATION   '
+02512  5EAF  FF                    BYTE $FF
+02513  5EB0             
+02514  5EB0  20 05 0E   MESSAGE8   TEXT ' ENJOY THE RIDE '
+02515  5EC0  FF                    BYTE $FF
+02516  5EC1             
+02517  5EC1  20 20 20   MESSAGE9   TEXT '                '
+02518  5ED1  FF                    BYTE $FF
+02519  5ED2             
+02520  5ED2             
+02521  5ED2             
+02522  5ED2             ;MESSAGE2
+02523  5ED2             ;        TEXT '    YOU ARE     '
+02524  5ED2             ;        ;BYTE 0,0,0,0,0,0,27,28,29,30,31,0,0,0,0,0,0
+02525  5ED2             ;        BYTE $FF
+02526  5ED2             
+02527  5ED2             
+02528  5ED2             
+02529  5ED2  00         FADE_CTR_T BYTE $0
+02530  5ED3             
+02531  5ED3  00         LSRL_BUF   BYTE 0
+02532  5ED4             
+02533  5ED4             LSRL_TABLE1 
+02534  5ED4             
+02535  5ED4  00 00 00              BYTE 00,00,00,01,01,01,02,02,03,04,05,06,06,07,07,07
+02536  5EE4  06 06 06              BYTE 06,06,06,05,04,03,02,02,01,01,01,$FF
+02537  5EF0             
+02538  5EF0             
+02539  5EF0  00 01 02              BYTE 00,01,02,03,04,05,06,07, 00,01,02,03,04,05,06,07
+02540  5F00  00 01 02              BYTE 00,01,02,03,04,05,06,07, 00,01,02,03,04,05,06,07
+02541  5F10             
+02542  5F10             
+02543  5F10  07 06 05              BYTE 07,06,05,04,03,02,01,00, 07,06,05,04,03,02,01,00
+02544  5F20  07 06 05              BYTE 07,06,05,04,03,02,01,00, 07,06,05,04,03,02,01,00
+02545  5F30             
+02546  5F30  FF                    BYTE $FF
+02547  5F31             
+02548  5F31             LSRL_TABLE2 
+02549  5F31  08 08 08              BYTE 08,08,08,08,08,08,08,08, 09,09,09,09,09,09,09,09
+02550  5F41  0A 0A 0A              BYTE 10,10,10,10,10,10,10,10, 11,11,11,11,11,11,11,11
+02551  5F51             
+02552  5F51  0B 0B 0B              BYTE 11,11,11,11,11,11,11,11, 10,10,10,10,10,10,10,10
+02553  5F61  09 09 09              BYTE 09,09,09,09,09,09,09,09, 08,08,08,08,08,08,08,08
+02554  5F71             
+02555  5F71  FF                    BYTE $FF
+02556  5F72             
+02557  5F72  00         LSR_CTR    BYTE 0
+02558  5F73             
+02559  5F73  06         LOGO_X     BYTE $06
+02560  5F74             
+02561  5F74  FF         DRL_ANI_CTR BYTE $FF
+02562  5F75             
+02563  5F75             DRL_ANI_TBL 
+02564  5F75  00                    BYTE <M64LOGO_COLOR0
+02565  5F76  51                    BYTE >M64LOGO_COLOR0
+02566  5F77  C0                    BYTE <M64LOGO_COLOR1
+02567  5F78  51                    BYTE >M64LOGO_COLOR1
+02568  5F79  80                    BYTE <M64LOGO_COLOR2
+02569  5F7A  52                    BYTE >M64LOGO_COLOR2
+02570  5F7B  40                    BYTE <M64LOGO_COLOR3
+02571  5F7C  53                    BYTE >M64LOGO_COLOR3
+02572  5F7D  00                    BYTE <M64LOGO_COLOR4
+02573  5F7E  54                    BYTE >M64LOGO_COLOR4
+02574  5F7F  C0                    BYTE <M64LOGO_COLOR5
+02575  5F80  54                    BYTE >M64LOGO_COLOR5
+02576  5F81  80                    BYTE <M64LOGO_COLOR6
+02577  5F82  55                    BYTE >M64LOGO_COLOR6
+02578  5F83  40                    BYTE <M64LOGO_COLOR7
+02579  5F84  56                    BYTE >M64LOGO_COLOR7
+02580  5F85             
+02581  5F85             
+02582  5F85             
+02583  5F85             
+02584  5F85             BIN2HEXTBL 
+02585  5F85  30 31 32              BYTE '0123456789ABCDEF'
+02586  5F95             
+02587  5F95             
+02588  5F95  00         LAST1      BYTE 0
+02589  5F96  00         LAST2      BYTE 0
+02590  5F97  00         LAST3      BYTE 0
+02591  5F98             
+02592  5F98  00         DO1        BYTE 0
+02593  5F99  00         DO2        BYTE 0
+02594  5F9A  00         DO3        BYTE 0
+02595  5F9B             
+02596  5F9B             
+02597  5F9B             
+02598  5F9B             
+02599  5F9B             
+02600  5F9B             ALIGN      256
+02601  6000             RB_COLORS1 
+02602  6000  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02603  600A  00                    BYTE 0
+02604  600B  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02605  6012  00                    BYTE 0
+02606  6013  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02607  6019             
+02608  6019  04 0E 0F              BYTE 4, 14, 15, 1, 1, 1, 1, 15, 14, 4
+02609  6023  00                    BYTE 0
+02610  6024  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02611  602B  00                    BYTE 0
+02612  602C  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02613  6032             
+02614  6032  04 0E 01              BYTE 4, 14, 1, 1, 1, 1, 1, 1, 14, 4
+02615  603C  00                    BYTE 0
+02616  603D  06 0E 01              BYTE 6, 14, 1, 1, 1, 14, 6
+02617  6044  00                    BYTE 0
+02618  6045  06 01 01              BYTE 6, 1,  1, 6,0 ,0
+02619  604B             
+02620  604B  04 01 01              BYTE 4, 1, 1, 1, 1, 1, 1, 1, 1, 4
+02621  6055  00                    BYTE 0
+02622  6056  06 01 01              BYTE 6, 1, 1, 1, 1, 1, 6
+02623  605D  00                    BYTE 0
+02624  605E  06 01 06              BYTE 6, 1, 6, 0 ,0,0
+02625  6064             
+02626  6064  01 01 01              BYTE 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+02627  607D             
+02628  607D  04 01 01              BYTE 4, 1, 1, 1, 1, 1, 1, 1, 1, 4
+02629  6087  00                    BYTE 0
+02630  6088  06 01 01              BYTE 6, 1, 1, 1, 1, 1, 6
+02631  608F  00                    BYTE 0
+02632  6090  06 01 06              BYTE 6, 1, 6, 0,0 ,0
+02633  6096             
+02634  6096  04 0E 01              BYTE 4, 14, 1, 1, 1, 1, 1, 1, 14, 4
+02635  60A0  00                    BYTE 0
+02636  60A1  06 0E 01              BYTE 6, 14, 1, 1, 1, 14, 6
+02637  60A8  00                    BYTE 0
+02638  60A9  06 01 01              BYTE 6, 1, 1, 6, 0,0
+02639  60AF             
+02640  60AF  04 0E 0F              BYTE 4, 14, 15, 1, 1, 1, 1, 15, 14, 4
+02641  60B9  00                    BYTE 0
+02642  60BA  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02643  60C1  00                    BYTE 0
+02644  60C2  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02645  60C8             
+02646  60C8             
+02647  60C8  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02648  60D2  00                    BYTE 0
+02649  60D3  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02650  60DA  00                    BYTE 0
+02651  60DB  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02652  60E1             
+02653  60E1  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02654  60EB  00                    BYTE 0
+02655  60EC  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02656  60F3  00                    BYTE 0
+02657  60F4  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02658  60FA             
+02659  60FA             
+02660  60FA                        
+02661  60FA  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02662  6104  00                    BYTE 0
+02663  6105  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02664  610C  00                    BYTE 0
+02665  610D  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02666  6113             
+02667  6113  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02668  611D  00                    BYTE 0
+02669  611E  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02670  6125  00                    BYTE 0
+02671  6126  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02672  612C             
+02673  612C  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02674  6136  00                    BYTE 0
+02675  6137  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02676  613E  00                    BYTE 0
+02677  613F  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02678  6145             
+02679  6145  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02680  614F  00                    BYTE 0
+02681  6150  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02682  6157  00                    BYTE 0
+02683  6158  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02684  615E             
+02685  615E  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02686  6168  00                    BYTE 0
+02687  6169  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02688  6170  00                    BYTE 0
+02689  6171  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02690  6177             
+02691  6177  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02692  6181  00                    BYTE 0
+02693  6182  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02694  6189  00                    BYTE 0
+02695  618A  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02696  6190             
+02697  6190  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02698  619A  00                    BYTE 0
+02699  619B  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02700  61A2  00                    BYTE 0
+02701  61A3  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02702  61A9             
+02703  61A9  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02704  61B3  00                    BYTE 0
+02705  61B4  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02706  61BB  00                    BYTE 0
+02707  61BC  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02708  61C2             
+02709  61C2  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02710  61CC  00                    BYTE 0
+02711  61CD  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02712  61D4  00                    BYTE 0
+02713  61D5  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02714  61DB             
+02715  61DB  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02716  61E5  00                    BYTE 0
+02717  61E6  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02718  61ED  00                    BYTE 0
+02719  61EE  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02720  61F4             
+02721  61F4  04 0E 0F              BYTE 4, 14, 15, 3, 1, 1, 3, 15, 14, 4
+02722  61FE  00                    BYTE 0
+02723  61FF  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6
+02724  6206  00                    BYTE 0
+02725  6207  06 0E 01              BYTE 6, 14, 1, 14, 6,0
+02726  620D             
+02727  620D             ALIGN      256
+02728  6300             RB_COLORS2 
+02729  6300             
+02730  6300  00 00 00              BYTE 0, 0, 0, 0
+02731  6304  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02732  630A  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02733  6312  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02734  6317  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02735  631D             
+02736  631D  06 00 00              BYTE 6, 0, 0, 0
+02737  6321  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02738  6327  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02739  632F  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02740  6334  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02741  633A             
+02742  633A  06 00 00              BYTE 6, 0, 0, 0
+02743  633E  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02744  6344  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02745  634C  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02746  6351  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02747  6357             
+02748  6357  06 00 00              BYTE 6, 0, 0, 0
+02749  635B  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02750  6361  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02751  6369  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02752  636E  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02753  6374             
+02754  6374  06 00 00              BYTE 6, 0, 0, 0
+02755  6378  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02756  637E  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02757  6386  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02758  638B  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02759  6391             
+02760  6391  06 00 00              BYTE 6, 0, 0, 0
+02761  6395  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02762  639B  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02763  63A3  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02764  63A8  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02765  63AE             
+02766  63AE  06 00 00              BYTE 6, 0, 0, 0
+02767  63B2  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02768  63B8  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02769  63C0  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02770  63C5  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02771  63CB             
+02772  63CB  06 00 00              BYTE 6, 0, 0, 0
+02773  63CF  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02774  63D5  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02775  63DD  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02776  63E2  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02777  63E8             
+02778  63E8  06 00 00              BYTE 6, 0, 0, 0
+02779  63EC  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02780  63F2  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02781  63FA  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02782  63FF  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02783  6405             
+02784  6405  06 00 00              BYTE 6, 0, 0, 0
+02785  6409  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02786  640F  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02787  6417  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02788  641C  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02789  6422             
+02790  6422  06 00 00              BYTE 6, 0, 0, 0
+02791  6426  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02792  642C  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02793  6434  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02794  6439  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02795  643F             
+02796  643F  06 00 00              BYTE 6, 0, 0, 0
+02797  6443  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02798  6449  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02799  6451  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02800  6456  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02801  645C             
+02802  645C  06 00 00              BYTE 6, 0, 0, 0
+02803  6460  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02804  6466  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02805  646E  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02806  6473  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02807  6479             
+02808  6479  06 00 00              BYTE 6, 0, 0, 0
+02809  647D  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02810  6483  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02811  648B  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02812  6490  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02813  6496             
+02814  6496  06 00 00              BYTE 6, 0, 0, 0
+02815  649A  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02816  64A0  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02817  64A8  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02818  64AD  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02819  64B3             
+02820  64B3  06 00 00              BYTE 6, 0, 0, 0
+02821  64B7  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02822  64BD  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02823  64C5  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02824  64CA  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02825  64D0             
+02826  64D0  06 00 00              BYTE 6, 0, 0, 0
+02827  64D4  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02828  64DA  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02829  64E2  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02830  64E7  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02831  64ED             
+02832  64ED  06 00 00              BYTE 6, 0, 0, 0
+02833  64F1  06 0E 01              BYTE 6, 14, 1, 14, 6, 0
+02834  64F7  06 0E 0F              BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02835  64FF  04 0E 0F              BYTE 4, 14, 15, 3, 1
+02836  6504  01 03 0F              BYTE 1, 3, 15, 14, 4, 0
+02837  650A             
+02838  650A             
+02839  650A             A4_COLORS  
+02840  650A             ; BYTE 6, 14, 1, 14, 6, 0
+02841  650A             ; BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02842  650A             ; BYTE 4, 14, 15, 3, 1
+02843  650A             ; BYTE 1, 3, 15, 14, 4, 0
+02844  650A             ; BYTE 6, 14, 1, 14, 6, 0
+02845  650A             ; BYTE 6, 14, 15, 1, 15, 14, 6, 0
+02846  650A             ; BYTE 4, 14, 15, 3, 1
+02847  650A             ; BYTE 1, 3, 15, 14, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02848  650A             ; BYTE 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02849  650A             ; BYTE 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02850  650A             
+02851  650A             
+02852  650A  0C 05 0D              BYTE 12, 5, 13, 1, 13, 5, 12
+02853  6511  00 00 00              BYTE 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02854  6521  0C 06 0E              BYTE 12, 6, 14, 1, 14, 6, 12
+02855  6528  00 00 00              BYTE 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02856  6538  0C 03 0A              BYTE 12, 3, 10, 1, 10, 3, 12
+02857  653F  00 00 00              BYTE 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+02858  654F             
+02859  654F             
+02860  654F             ; -------------------------------------------------------
+02861  654F             ; STARTUP PARTS
+02862  654F             
+02863  654F             
+02864  654F  A2 32      DO_FADEIN  LDX #50
+02865  6551             
+02866  6551             DO_FADEIN3 
+02867  6551  A9 FF                 LDA #255
+02868  6553  CD 12 D0              CMP $D012
+02869  6556  D0 FB                 BNE *-3
+02870  6558             
+02871  6558  A9 FA                 LDA #250
+02872  655A  CD 12 D0              CMP $D012
+02873  655D  D0 FB                 BNE *-3
+02874  655F             
+02875  655F                        
+02876  655F             
+02877  655F  CA                    DEX
+02878  6560  D0 EF                 BNE DO_FADEIN3
+02879  6562             
+02880  6562                        
+02881  6562             
+02882  6562             
+02883  6562             DO_FADEIN2 
+02884  6562             
+02885  6562  A9 FF                 LDA #255
+02886  6564  CD 12 D0              CMP $D012
+02887  6567  D0 FB                 BNE *-3
+02888  6569             
+02889  6569  A9 FA                 LDA #250
+02890  656B  CD 12 D0              CMP $D012
+02891  656E  D0 FB                 BNE *-3
+02892  6570             
+02893  6570  A9 F5                 LDA #245
+02894  6572  CD 12 D0              CMP $D012
+02895  6575  D0 FB                 BNE *-3
+02896  6577             
+02897  6577                        
+02898  6577             
+02899  6577             
+02900  6577  20 F5 65              JSR STRT_DRAW_LOGO
+02901  657A             
+02902  657A  EE F4 65              INC FI_FRMCTR
+02903  657D  AD F4 65              LDA FI_FRMCTR
+02904  6580  C9 12                 CMP #18
+02905  6582  F0 03                 BEQ @ENDME
+02906  6584             
+02907  6584  4C 62 65              JMP DO_FADEIN2
+02908  6587             
+02909  6587             @ENDME     
+02910  6587             
+02911  6587             
+02912  6587             
+02913  6587  20 DA 66              JSR FI_MSG
+02914  658A             
+02915  658A  20 F0 66   @ENDMELOOP JSR FI_MSG1
+02916  658D             
+02917  658D  EE F4 65              INC FI_FRMCTR
+02918  6590  AD F4 65              LDA FI_FRMCTR
+02919  6593  C9 1E                 CMP #30
+02920  6595  F0 26                 BEQ @ENDME2
+02921  6597             
+02922  6597  A9 FF                 LDA #255
+02923  6599  CD 12 D0              CMP $D012
+02924  659C  D0 FB                 BNE *-3
+02925  659E             
+02926  659E  A9 FA                 LDA #250
+02927  65A0  CD 12 D0              CMP $D012
+02928  65A3  D0 FB                 BNE *-3
+02929  65A5             
+02930  65A5  A9 F5                 LDA #245
+02931  65A7  CD 12 D0              CMP $D012
+02932  65AA  D0 FB                 BNE *-3
+02933  65AC             
+02934  65AC  A9 F0                 LDA #240
+02935  65AE  CD 12 D0              CMP $D012
+02936  65B1  D0 FB                 BNE *-3
+02937  65B3             
+02938  65B3  A9 EB                 LDA #235
+02939  65B5  CD 12 D0              CMP $D012
+02940  65B8  D0 FB                 BNE *-3
+02941  65BA             
+02942  65BA                        
+02943  65BA             
+02944  65BA  4C 8A 65              JMP @ENDMELOOP
+02945  65BD                        
+02946  65BD             
+02947  65BD             @ENDME2    
+02948  65BD             
+02949  65BD             ; FADE IN SPRITE A4
+02950  65BD             
+02951  65BD  A2 98                 LDX #$98
+02952  65BF  8E F8 07              STX $07F8
+02953  65C2  A9 01                 LDA #%00000001
+02954  65C4  8D 15 D0              STA $D015 ; 1-8 SPRITES ON
+02955  65C7  A9 00                 LDA #$0
+02956  65C9  8D 1C D0              STA $D01C ; 1-8 SPRITES MULTICOLOR OFF
+02957  65CC                        
+02958  65CC                        ; X-COORDS
+02959  65CC  A9 00                 LDA #0
+02960  65CE  8D 10 D0              STA $D010 ; HI BIT X FOR ALL = 0
+02961  65D1             
+02962  65D1                        ; X
+02963  65D1  A9 B5                 LDA #181
+02964  65D3  8D 00 D0              STA $D000
+02965  65D6  A9 61                 LDA #97
+02966  65D8  8D 01 D0              STA $D001
+02967  65DB             
+02968  65DB             @XXX1
+02969  65DB  AE 20 67              LDX FI_SPR_CTR
+02970  65DE  BD 13 67              LDA FADE_IN_COLORS_SPRITE,X
+02971  65E1  8D 27 D0              STA $D027
+02972  65E4             
+02973  65E4  20 21 67              JSR RLOOP2
+02974  65E7             
+02975  65E7  EE 20 67              INC FI_SPR_CTR
+02976  65EA  AD 20 67              LDA FI_SPR_CTR
+02977  65ED  C9 0A                 CMP #10 ;#10
+02978  65EF  D0 EA                 BNE @XXX1
+02979  65F1             
+02980  65F1             
+02981  65F1             
+02982  65F1             
+02983  65F1  4C 98 10              JMP CONTINUE
+02984  65F4                        
+02985  65F4             
+02986  65F4  00         FI_FRMCTR  BYTE 0
+02987  65F5             
+02988  65F5             
+02989  65F5             
+02990  65F5             
+02991  65F5             STRT_DRAW_LOGO 
+02992  65F5  A9 04                 LDA #$04
+02993  65F7  8D 14 66              STA STRT_DRL_STA_0400+2
+02994  65FA  AD 73 5F              LDA LOGO_X
+02995  65FD  8D 13 66              STA STRT_DRL_STA_0400+1
+02996  6600             
+02997  6600  A9 D8                 LDA #$D8
+02998  6602  8D 55 66              STA STRT_DRL_STA_D800+2
+02999  6605  AD 73 5F              LDA LOGO_X
+03000  6608  8D 54 66              STA STRT_DRL_STA_D800+1
+03001  660B             
+03002  660B             
+03003  660B  A2 00                 LDX #0
+03004  660D                        
+03005  660D             STRT_DRL_LOOP_OUTER 
+03006  660D  A0 18                 LDY #24
+03007  660F             
+03008  660F             STRT_DRL_LOOP_INNER 
+03009  660F  BD 00 57              LDA M64LOGO_CHARS,X
+03010  6612                        
+03011  6612  9D 00 04   STRT_DRL_STA_0400 STA $0400,X
+03012  6615             
+03013  6615             STRT_DRL_LDA_LOGO_COLOR 
+03014  6615  8E D9 66              STX TMP_X
+03015  6618                        
+03016  6618  BD 00 51              LDA M64LOGO_COLOR,X
+03017  661B                        
+03018  661B  AE F4 65              LDX FI_FRMCTR
+03019  661E             @XXX1
+03020  661E  C9 01                 CMP #1 ; WHITE
+03021  6620  F0 13                 BEQ FI_WHITE
+03022  6622  C9 0F                 CMP #15
+03023  6624  F0 15                 BEQ FI_LGRY
+03024  6626  C9 0C                 CMP #12
+03025  6628  F0 23                 BEQ FI_MGRY
+03026  662A  C9 0E                 CMP #14
+03027  662C  F0 19                 BEQ FI_LBLU
+03028  662E  C9 0B                 CMP #11
+03029  6630  F0 0F                 BEQ FI_DGRY
+03030  6632             
+03031  6632  4C 50 66              JMP GO2
+03032  6635             
+03033  6635  BD 7E 66   FI_WHITE   LDA STRT_FI_LOGO_COL_WHITE,X
+03034  6638  4C 50 66              JMP GO2
+03035  663B             
+03036  663B  BD 90 66   FI_LGRY    LDA STRT_FI_LOGO_COL_LGRY,X
+03037  663E  4C 50 66              JMP GO2
+03038  6641             
+03039  6641  BD A2 66   FI_DGRY    LDA STRT_FI_LOGO_COL_DGRY,X
+03040  6644  4C 50 66              JMP GO2
+03041  6647             
+03042  6647  BD B4 66   FI_LBLU    LDA STRT_FI_LOGO_COL_LBLU,X
+03043  664A  4C 50 66              JMP GO2
+03044  664D             
+03045  664D  BD C6 66   FI_MGRY    LDA STRT_FI_LOGO_COL_MGRY,X
+03046  6650                        ;JMP GO2
+03047  6650             
+03048  6650  AE D9 66   GO2        LDX TMP_X
+03049  6653             
+03050  6653             
+03051  6653             
+03052  6653             STRT_DRL_STA_D800 
+03053  6653  9D 00 D8              STA $D800,X
+03054  6656             
+03055  6656  E8                    INX
+03056  6657             
+03057  6657  88                    DEY
+03058  6658  D0 B5                 BNE STRT_DRL_LOOP_INNER
+03059  665A             
+03060  665A  E0 C0                 CPX #192
+03061  665C  F0 1F                 BEQ STRT_DRL_END
+03062  665E             
+03063  665E  AD 13 66              LDA STRT_DRL_STA_0400+1
+03064  6661  18                    CLC
+03065  6662  69 10                 ADC #16
+03066  6664  D0 03                 BNE @STRT_GOON
+03067  6666  EE 14 66              INC STRT_DRL_STA_0400+2
+03068  6669  8D 13 66   @STRT_GOON STA STRT_DRL_STA_0400+1
+03069  666C             
+03070  666C  AD 54 66              LDA STRT_DRL_STA_D800+1
+03071  666F  18                    CLC
+03072  6670  69 10                 ADC #16
+03073  6672  D0 03                 BNE @STRT_GOON2
+03074  6674  EE 55 66              INC STRT_DRL_STA_D800+2
+03075  6677  8D 54 66   @STRT_GOON2 STA STRT_DRL_STA_D800+1
+03076  667A             
+03077  667A             
+03078  667A  4C 0D 66              JMP STRT_DRL_LOOP_OUTER
+03079  667D             
+03080  667D             STRT_DRL_END 
+03081  667D             
+03082  667D  60                    RTS
+03083  667E             ;----------
+03084  667E             
+03085  667E             
+03086  667E             STRT_FI_LOGO_COL_WHITE 
+03087  667E  00 00 00              BYTE 0,0,0,0,0,0,0,0
+03088  6686  00 0B 0B              BYTE 00,11,11,12,12,15,15,1    ,15,1
+03089  6690             
+03090  6690             
+03091  6690             STRT_FI_LOGO_COL_LGRY 
+03092  6690  00 00 00              BYTE 0,0,0,0,0,0,0,0
+03093  6698  00 0B 0B              BYTE 00,11,11, 6, 6,12,12,15   ,12,15
+03094  66A2             
+03095  66A2             STRT_FI_LOGO_COL_DGRY 
+03096  66A2  00 00 00              BYTE 0,0,0,0,0,0,0,0
+03097  66AA  00 0B 0B              BYTE 00,11,11, 4,12,15,12,11,    4, 11
+03098  66B4             
+03099  66B4             STRT_FI_LOGO_COL_LBLU 
+03100  66B4  00 00 00              BYTE 0,0,0,0,0,0,0,0
+03101  66BC  00 0B 0B              BYTE 00,11,11, 6, 6,14, 3, 1,    3, 14
+03102  66C6             
+03103  66C6             STRT_FI_LOGO_COL_MGRY 
+03104  66C6  00 00 00              BYTE 0,0,0,0,0,0,0,0
+03105  66CE  00 0B 0B              BYTE 00,11,11,12,12,15,15, 3,   15,12
+03106  66D8             
+03107  66D8             STRT_FI_LOGO_CTR 
+03108  66D8  00                    BYTE 0
+03109  66D9             
+03110  66D9  00         TMP_X      BYTE 0
+03111  66DA             
+03112  66DA             ;__________
+03113  66DA             
+03114  66DA             
+03115  66DA             FI_MSG
+03116  66DA  A2 00                 LDX #0
+03117  66DC             
+03118  66DC             @PRINTLOOP 
+03119  66DC  A9 00                 LDA #0
+03120  66DE  9D 68 DA              STA $DA68,X
+03121  66E1  BD 94 1A              LDA STARTMSG,X
+03122  66E4  C9 FF                 CMP #$FF
+03123  66E6  F0 07                 BEQ @ENDPRINT
+03124  66E8                        ;CMP #32
+03125  66E8                        ;BNE @DOSTA
+03126  66E8                        ;LDA #0
+03127  66E8                        
+03128  66E8             ;@DOSTA
+03129  66E8             
+03130  66E8  9D 68 06              STA $668,X
+03131  66EB                        ;STA $700-35,X
+03132  66EB  E8                    INX
+03133  66EC  4C DC 66              JMP @PRINTLOOP
+03134  66EF                        
+03135  66EF             @ENDPRINT
+03136  66EF  60                    RTS
+03137  66F0             
+03138  66F0             
+03139  66F0             
+03140  66F0             FI_MSG1    
+03141  66F0             
+03142  66F0  EE 02 67              INC @FADE_CTR
+03143  66F3  AE 02 67              LDX @FADE_CTR
+03144  66F6                        
+03145  66F6  BD 06 67              LDA FADE_IN_COLORS_STRT,X
+03146  66F9             
+03147  66F9             @GOON1     
+03148  66F9  A2 10                 LDX #16
+03149  66FB             @LOOP1
+03150  66FB  9D 67 DA              STA $DA68-1,X
+03151  66FE  CA                    DEX
+03152  66FF  D0 FA                 BNE @LOOP1
+03153  6701             
+03154  6701             ;
+03155  6701             @ENDME
+03156  6701             
+03157  6701             
+03158  6701  60                    RTS
+03159  6702             
+03160  6702  00         @FADE_CTR  BYTE 0
+03161  6703             
+03162  6703  01         @FADE_IN_OUT BYTE 1 ; 1 IN, 0 OUT
+03163  6704             
+03164  6704  00         @FADE_STAY_CTR BYTE 0
+03165  6705                        
+03166  6705  00         @DELAY     BYTE 0
+03167  6706             
+03168  6706  00 00 0B   FADE_IN_COLORS_STRT BYTE 0,0,11,2,10,1,10,15,12,11,5,13,1
+03169  6713             
+03170  6713  00 0B 0C   FADE_IN_COLORS_SPRITE BYTE 0, 11, 12, 15, 1, 15, 12, 15, 1, 1, 3, 11, 13
+03171  6720  00         FI_SPR_CTR BYTE 0
+03172  6721             
+03173  6721             RLOOP2     
+03174  6721  A0 02                 LDY #2
+03175  6723             @LL1
+03176  6723  A2 FF                 LDX #$FF
+03177  6725  CA                    DEX
+03178  6726  D0 FD                 BNE *-1
+03179  6728             
+03180  6728  A9 00                 LDA #0
+03181  672A  CD 12 D0              CMP $D012
+03182  672D  D0 FB                 BNE *-3
+03183  672F             
+03184  672F  A2 FF                 LDX #$FF
+03185  6731  CA                    DEX
+03186  6732  D0 FD                 BNE *-1
+03187  6734             
+03188  6734  88                    DEY
+03189  6735  D0 EC                 BNE @LL1
+03190  6737  60                    RTS
+03191  6738             
+03192  6738             
+
+******* 126 Label(s) *******
+a4_color = $13F8 
+a4_color_ctr = $13F9 
+a4_colors = $650A 
+ac_1 = $176B 
+ac_2 = $176C 
+ac_3 = $176D 
+bin2hextbl = $5F85 
+char_ani = $176F 
+char_ani_delay = $176E 
+CHARSET = $2000 
+continue = $1098 
+current_msg = $5D83 
+do_fadein = $654F 
+do_fadein2 = $6562 
+do_fadein3 = $6551 
+do_vis = $13FA 
+DO1 = $5F98 
+DO2 = $5F99 
+DO3 = $5F9A 
+dotcolors = $2888 
+draw_logo = $1A2F 
+DRL_ani_ctr = $5F74 
+DRL_ANI_TBL = $5F75 
+drl_end = $1A64 
+drl_lda_logo_color = $1A39 
+drl_loop_inner = $1A33 
+drl_loop_outer = $1A31 
+drl_sta_0400 = $1A36 
+drl_sta_d800 = $1A3C 
+ENDSID = $507C 
+fade_ctr_t = $5ED2 
+fade_in_colors = $5DAC 
+fade_in_colors_sprite = $6713 
+fade_in_colors_strt = $6706 
+fade_msgs = $19A9 
+fade_out_colors = $5DA4 
+fi_dgry = $6641 
+fi_frmctr = $65F4 
+fi_lblu = $6647 
+fi_lgry = $663B 
+fi_mgry = $664D 
+fi_msg = $66DA 
+fi_msg1 = $66F0 
+fi_spr_ctr = $6720 
+fi_white = $6635 
+FRAMECTR = $127D 
+go2 = $6650 
+INIT = $1000 
+IRQ = $1300 
+IRQINIT = $1242 
+last1 = $5F95 
+last2 = $5F96 
+last3 = $5F97 
+logo_color_ani = $1973 
+logo_scroll_lr = $1951 
+LOGO_X = $5F73 
+lsr_ctr = $5F72 
+lsrl_buf = $5ED3 
+lsrl_table1 = $5ED4 
+lsrl_table2 = $5F31 
+M64LOGO_chars = $5700 
+M64LOGO_color = $5100 
+M64LOGO_color0 = $5100 
+M64LOGO_color1 = $51C0 
+M64LOGO_color2 = $5280 
+M64LOGO_color3 = $5340 
+M64LOGO_color4 = $5400 
+M64LOGO_color5 = $54C0 
+M64LOGO_color6 = $5580 
+M64LOGO_color7 = $5640 
+message_table = $5D84 
+message1 = $5E39 
+message2 = $5E4A 
+message3 = $5E5B 
+message4 = $5E6C 
+message5 = $5E7D 
+message6 = $5E8E 
+message7 = $5E9F 
+message8 = $5EB0 
+message9 = $5EC1 
+move_scrollcolors = $1932 
+move_sprites = $1540 
+move_sprites2 = $15F9 
+printsongmsg = $1AA9 
+printstartmsg = $1A7D 
+rasta1 = $16EB 
+rasta2 = $172B 
+rb_colors1 = $6000 
+rb_colors2 = $6300 
+rloop = $1069 
+rloop2 = $6721 
+scrn_is_black = $1080 
+scrollcolors = $2800 
+scroller = $17B3 
+sin_x1 = $5D00 
+sin_x2 = $5A00 
+sin_x3 = $5800 
+sin_x4 = $5900 
+sin_x5 = $5B00 
+SONGMSG = $1AC0 
+sound_vis = $146C 
+SPRDATA_0xF = $2400 
+SPRDATA_SMALL = $2600 
+sprmov_offs = $153E 
+sprmov_offs2 = $15F7 
+sprmov_yoffs = $153F 
+sprmov_yoffs2 = $15F8 
+SPRPRIORITY = $16EA 
+startmsg = $1A94 
+strt_draw_logo = $65F5 
+strt_drl_end = $667D 
+strt_drl_lda_logo_color = $6615 
+strt_drl_loop_inner = $660F 
+strt_drl_loop_outer = $660D 
+strt_drl_sta_0400 = $6612 
+strt_drl_sta_d800 = $6653 
+strt_fi_logo_col_dgry = $66A2 
+strt_fi_logo_col_lblu = $66B4 
+strt_fi_logo_col_lgry = $6690 
+strt_fi_logo_col_mgry = $66C6 
+strt_fi_logo_col_white = $667E 
+strt_fi_logo_ctr = $66D8 
+title_fade1 = $5DB9 
+title_fade2 = $5DF9 
+tmp_x = $66D9 
+waitkey = $1A65 
+
+******* 37 Unused label(s) *******
+@check
+@cont01
+@cont1set
+@cont2clear
+@cont3clear
+@delay
+@delay
+@disp_mask
+@dl1
+@do_it
+@do_print
+@dodo
+@dosc
+@dosta
+@dotloop
+@dotloop2
+@end
+@end
+@end
+@endme
+@endme
+@endme
+@endme2
+@endmeloop
+@endprint
+@endprint
+@endscroll
+@fade_ctr
+@fade_ctr
+@fade_in
+@fade_in_out
+@fade_in_out
+@fade_out
+@fade_stay_ctr
+@fade_stay_ctr
+@go1
+@go11
+@go2
+@go22
+@go3
+@go33
+@goon
+@goon
+@goon_t
+@goon1
+@goon1
+@goon1
+@goon2
+@goon2
+@goonn
+@in_to_out
+@l1
+@l1
+@l2
+@l2
+@l3
+@lala
+@lala
+@last_scrn
+@ll1
+@ll1
+@loop
+@loop
+@loop_t
+@loop_t
+@loop1
+@loop1
+@loop1
+@loop2
+@loop2
+@next_fade_step
+@nextchar
+@nospeedscroll
+@printchar
+@printloop
+@printloop
+@scrollcolptr
+@scrollreg
+@scrolltext
+@scrolltext_pos
+@sk
+@sk2
+@skip1
+@skip1
+@skip2
+@skip3
+@skip4
+@skk
+@stay_ctr
+@storechar
+@storechar
+@strt_goon
+@strt_goon2
+@stuffflag
+@testpriority
+@tol2
+@xit
+@xit
+@xit2
+@xit2
+@xit3
+@xit3
+@xxx1
+@xxx1
+a4_color
+CHARSET
+DRL_ani_ctr
+drl_lda_logo_color
+drl_sta_0400
+drl_sta_d800
+ENDSID
+INIT
+IRQINIT
+lsrl_table2
+M64LOGO_color0
+M64LOGO_color1
+M64LOGO_color2
+M64LOGO_color3
+M64LOGO_color4
+M64LOGO_color5
+M64LOGO_color6
+M64LOGO_color7
+message2
+message3
+message4
+message5
+message6
+message7
+message8
+message9
+sin_x1
+sin_x3
+sin_x4
+SPRDATA_0xF
+SPRDATA_SMALL
+sprmov_yoffs
+SPRPRIORITY
+strt_drl_lda_logo_color
+strt_drl_sta_0400
+strt_drl_sta_d800
+strt_fi_logo_ctr
+
+******* 17 Variable(s) *******
+CHAN1COL  = $DA1A
+CHAN1POS  = $061A
+CHAN2COL  = $DA1C
+CHAN2POS  = $061C
+CHAN3COL  = $DA1E
+CHAN3POS  = $061E
+CHANCOLOFF  = $000E
+CHANCOLON  = $0001
+INIT_SOUND  = $4000
+MINUS  = $005E
+PLAY_SOUND  = $4003
+PLUS  = $0018
+RASTERBAR_POS  = $0012
+SPRY  = $00AA
+SWVARS  = $4021
+tgt_c64  = $0001
+TITLEPOS  = $059A
+******* -100 Unused variables(s) *******
+PLUS
+SWVARS
+tgt_c64
+TITLEPOS
+
