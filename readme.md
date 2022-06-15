@@ -1,6 +1,7 @@
 # endstation.asm
 
-Animated SID music file player for my tune "Endstation". This is the music for the end part of our BCC#10 demo party entry of the "Fantastic 4 Cracking Group" called "From Berlin to Paris and back".  
+Animated SID music file player for my tune "Endstation". This is the music for the end part of our BCC#10 demo party entry of the "Fantastic 4 Cracking Group" called "From Berlin to Paris and back" (see https://csdb.dk/release/?id=145600).  
+We ranked 4th place, and got a lot of praise, especially for the music :) (see https://www.pouet.net/prod.php?which=66993)
 
 It was one of my first C64-programs after a very long time after my childhood. This time (2015) I used "CBM PRG Studio" a unique all in one C64 assembler, charset-, sprite-editor and there is much more to it: https://www.ajordison.co.uk/ .  
 
