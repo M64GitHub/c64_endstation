@@ -13,6 +13,6 @@ The tune was then exported into the ".sid" format, and is sourced from the main 
 
 You can see a video of the running program here:
 
-[![Alt text](https://img.youtube.com/vi/Qvsqxakr1Zg/0.jpg)](https://www.youtube.com/watch?v=Qvsqxakr1Zg)
+[![Alt text](endstation3.gif)](https://www.youtube.com/watch?v=Qvsqxakr1Zg)
 
 (https://www.youtube.com/watch?v=Qvsqxakr1Zg)
